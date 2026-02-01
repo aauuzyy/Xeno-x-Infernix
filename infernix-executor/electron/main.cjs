@@ -59,40 +59,58 @@ const AI_API_KEY = 'javcgkmmT5+ss2PGB5P+5fVNiZS1Y37csPkiyneYEQqWgFZwiUCeCBH1bE5y
 
 // Try to load the executor addon
 const loadExecutorAddon = () => {
-  const candidates = [
-    // Use local bin folder first
+  // In packaged app, process.resourcesPath points to resources folder
+  const isPackaged = app.isPackaged;
+  const resourcesPath = process.resourcesPath || path.join(__dirname, '..');
+  
+  console.log('[Infernix] isPackaged:', isPackaged);
+  console.log('[Infernix] resourcesPath:', resourcesPath);
+  console.log('[Infernix] __dirname:', __dirname);
+  
+  const candidates = isPackaged ? [
+    // Packaged app: bin folder is in resources/bin
+    path.join(resourcesPath, 'bin', 'xeno.node'),
+  ] : [
+    // Dev mode: relative to electron folder
     path.join(__dirname, '..', 'bin', 'xeno.node'),
-    // Fallbacks
-    path.join(__dirname, '..', 'native', 'infernix-addon', 'build', 'Release', 'infernix.node'),
-    path.join(__dirname, '..', '..', 'xeno-v1.3.15-source', 'native', 'xeno-addon', 'build', 'Release', 'xeno.node'),
   ];
+  
+  console.log('[Infernix] Addon candidates:', candidates);
 
   for (const addonPath of candidates) {
     try {
+      console.log('[Infernix] Checking:', addonPath, 'exists:', fs.existsSync(addonPath));
       if (fs.existsSync(addonPath)) {
         executorAddon = require(addonPath);
-        console.log('Loaded executor addon from:', addonPath);
+        console.log('[Infernix] Loaded executor addon from:', addonPath);
         return true;
       }
     } catch (e) {
-      console.error('Failed to load addon from', addonPath, e.message);
+      console.error('[Infernix] Failed to load addon from', addonPath, e.message);
     }
   }
-  console.warn('No executor addon found - running in UI-only mode');
+  console.warn('[Infernix] No executor addon found - running in UI-only mode');
   return false;
 };
 
 // Initialize the executor
 const initializeExecutor = () => {
   if (!executorAddon) return false;
-  
+
   try {
-    // Set DLL path - check multiple locations
-    const dllCandidates = [
+    // In packaged app, DLL is in resources/bin
+    const isPackaged = app.isPackaged;
+    const resourcesPath = process.resourcesPath || path.join(__dirname, '..');
+    
+    const dllCandidates = isPackaged ? [
+      path.join(resourcesPath, 'bin', 'Xeno.dll'),
+      path.join(resourcesPath, 'bin', 'Infernix.dll'),
+    ] : [
       path.join(__dirname, '..', 'bin', 'Xeno.dll'),
-      path.join(__dirname, '..', 'xeno-v1.3.15-source', 'build', 'Xeno.dll'),
-      path.join(process.resourcesPath || '', 'Xeno.dll'),
+      path.join(__dirname, '..', 'bin', 'Infernix.dll'),
     ];
+    
+    console.log('[Infernix] DLL candidates:', dllCandidates);
     
     let dllPath = dllCandidates.find(p => fs.existsSync(p));
     if (!dllPath) {
