@@ -1,0 +1,32 @@
+directories:
+  output: release
+  buildResources: build
+appId: com.infernix.executor
+productName: Infernix
+files:
+  - filter:
+      - dist/**/*
+      - electron/**/*
+      - bin/**/*
+extraResources:
+  - from: bin
+    to: bin
+    filter:
+      - '**/*'
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: build/icon.ico
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+  installerHeaderIcon: build/icon.ico
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Infernix
+electronVersion: 40.1.0
