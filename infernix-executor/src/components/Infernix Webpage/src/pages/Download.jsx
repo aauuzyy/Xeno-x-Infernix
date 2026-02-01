@@ -56,7 +56,7 @@ const changelog = [
 
 export default function Download() {
   const handleDownload = () => {
-    window.open('https://github.com/aauuzyy/Xeno-x-Infernix/releases/latest', '_blank');
+    window.open('https://github.com/aauuzyy/Xeno-x-Infernix/releases/latest/download/Infernix.Setup.1.0.4.exe', '_blank');
   };
 
   return (
