@@ -1,17 +1,49 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  ArrowRight, 
-  Zap, 
-  Shield, 
-  Code2, 
-  Users, 
-  Cpu, 
+import {
+  ArrowRight,
+  Zap,
+  Shield,
+  Code2,
+  Users,
+  Cpu,
   Download,
   Flame,
-  Sparkles
+  Sparkles,
+  History
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+
+const changelog = [
+  {
+    version: '1.0.9',
+    date: 'February 2026',
+    changes: [
+      '🎨 Custom Themes - Color picker for accent colors',
+      '🚀 Auto-Update System - Detects new releases from GitHub',
+      '⚡ ScriptHub Virtualization - Smoother scrolling',
+      '🔥 Dynamic accent color across entire UI',
+    ]
+  },
+  {
+    version: '1.0.8',
+    date: 'February 2026',
+    changes: [
+      '🔥 Banwave Status indicator with API',
+      '🎮 Game detection for ScriptHub filtering',
+      '📊 Improved Dashboard stats',
+    ]
+  },
+  {
+    version: '1.0.7',
+    date: 'February 2026',
+    changes: [
+      '🔥 AutoExec now runs scripts on attach',
+      '🔥 Kill Roblox button added',
+      '🔥 Fixed Workspace AI chat',
+    ]
+  },
+];
 
 const features = [
   {
@@ -183,6 +215,52 @@ export default function Home() {
                 </div>
                 <h3 className="text-white font-semibold mb-1">{feature.title}</h3>
                 <p className="text-gray-500 text-sm">{feature.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Changelog Section */}
+      <section className="relative py-24">
+        <div className="max-w-4xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              <History className="inline-block w-8 h-8 mr-2 text-orange-500" />
+              Latest <span className="gradient-text">Updates</span>
+            </h2>
+            <p className="text-gray-500">See what's new in Infernix</p>
+          </motion.div>
+
+          <div className="space-y-6">
+            {changelog.map((release, index) => (
+              <motion.div
+                key={release.version}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="p-6 rounded-xl bg-white/5 border border-orange-500/20 hover:border-orange-500/40 transition-all"
+              >
+                <div className="flex items-center gap-4 mb-4">
+                  <span className="px-3 py-1 rounded-full bg-gradient-to-r from-orange-500 to-red-600 text-white text-sm font-bold">
+                    v{release.version}
+                  </span>
+                  <span className="text-gray-500 text-sm">{release.date}</span>
+                </div>
+                <ul className="space-y-2">
+                  {release.changes.map((change, i) => (
+                    <li key={i} className="text-gray-300 text-sm flex items-start gap-2">
+                      <span className="text-orange-500 mt-1">•</span>
+                      {change}
+                    </li>
+                  ))}
+                </ul>
               </motion.div>
             ))}
           </div>

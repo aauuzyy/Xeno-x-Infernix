@@ -730,3 +730,36 @@
 .scripts-container {
   scroll-behavior: smooth;
 }
+
+/* Virtualized card fade-in animation */
+.script-card.fade-in {
+  animation: cardFadeIn 0.35s ease forwards;
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.virtual-scroll-container {
+  will-change: transform;
+}
+
+.virtual-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding: 0 4px;
+}
+
+@media (max-width: 700px) {
+  .virtual-grid {
+    grid-template-columns: 1fr;
+  }
+}

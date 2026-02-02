@@ -6,6 +6,28 @@ import { useTheme } from '../contexts/ThemeContext';
 // Changelog data
 const CHANGELOG = [
   {
+    version: '1.0.9',
+    date: 'February 2026',
+    changes: [
+      '🎨 Custom Themes - Color picker for accent colors',
+      '🚀 Auto-Update System - Detects new releases from GitHub',
+      '⚡ ScriptHub Virtualization - Smoother scrolling with 1000s of scripts',
+      '🔥 Accent color applies to entire UI dynamically',
+      '✨ Fade animations for ScriptHub cards',
+      '🛠️ Fixed hardcoded colors throughout app',
+    ]
+  },
+  {
+    version: '1.0.8',
+    date: 'February 2026',
+    changes: [
+      '🔥 Banwave Status indicator with API integration',
+      '🎮 Game detection for ScriptHub filtering',
+      '📊 Improved Dashboard stats display',
+      '🛠️ Various bug fixes and optimizations',
+    ]
+  },
+  {
     version: '1.0.7',
     date: 'February 2026',
     changes: [
