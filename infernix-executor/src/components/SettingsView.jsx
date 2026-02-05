@@ -119,6 +119,7 @@ function SettingsView({ tabs, onNewTab, onSwitchToExecutor }) {
     autoCheckUpdates: true,
     debugConsole: false,
     theme: 'dark',
+    discordUsername: '',
   });
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [showAutoExec, setShowAutoExec] = useState(false);
@@ -350,6 +351,29 @@ function SettingsView({ tabs, onNewTab, onSwitchToExecutor }) {
           >
             <span className="toggle-knob" />
           </button>
+        </div>
+
+        <div className="setting-item">
+          <div className="setting-info">
+            <span className="setting-label">Discord Username</span>
+            <span className="setting-desc">Your Discord username for activity tracking</span>
+          </div>
+          <input
+            type="text"
+            value={settings.discordUsername || ''}
+            onChange={(e) => setSettings(prev => ({ ...prev, discordUsername: e.target.value }))}
+            placeholder="Enter Discord username"
+            className="settings-input"
+            style={{ 
+              width: '150px',
+              padding: '6px 10px',
+              borderRadius: '6px',
+              border: '1px solid var(--border)',
+              background: 'var(--bg-tertiary)',
+              color: 'var(--text-primary)',
+              fontSize: '13px'
+            }}
+          />
         </div>
       </div>
 

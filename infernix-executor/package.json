@@ -1,7 +1,7 @@
 {
     "name":  "infernix-executor",
     "private":  true,
-    "version": "1.1.8",
+    "version":  "1.1.9",
     "description":  "The next-generation Roblox executor",
     "author":  "Infernix Team",
     "main":  "electron/main.cjs",
@@ -73,28 +73,22 @@
                                          ],
                               "icon":  "build/icon.ico"
                           },
-                  "nsis": {
-      "oneClick": true,
-      "perMachine": false,
-      "allowToChangeInstallationDirectory": false,
-      "installerIcon": "build/icon.ico",
-      "uninstallerIcon": "build/icon.ico",
-      "installerHeaderIcon": "build/icon.ico",
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "shortcutName": "Infernix",
-      "include": "build/installer.nsh",
-      "installerHeader": "build/installerHeader.bmp",
-      "installerSidebar": "build/installerSidebar.bmp",
-      "uninstallerSidebar": "build/installerSidebar.bmp",
-      "license": "build/license.txt",
-      "warningsAsErrors": false
-    }
+                  "nsis":  {
+                               "oneClick":  true,
+                               "perMachine":  false,
+                               "allowToChangeInstallationDirectory":  false,
+                               "installerIcon":  "build/icon.ico",
+                               "uninstallerIcon":  "build/icon.ico",
+                               "installerHeaderIcon":  "build/icon.ico",
+                               "createDesktopShortcut":  true,
+                               "createStartMenuShortcut":  true,
+                               "shortcutName":  "Infernix",
+                               "include":  "build/installer.nsh",
+                               "installerHeader":  "build/installerHeader.bmp",
+                               "installerSidebar":  "build/installerSidebar.bmp",
+                               "uninstallerSidebar":  "build/installerSidebar.bmp",
+                               "license":  "build/license.txt",
+                               "warningsAsErrors":  false
+                           }
               }
 }
-
-
-
-
-
-

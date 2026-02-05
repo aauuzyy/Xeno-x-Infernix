@@ -373,12 +373,24 @@ ipcMain.handle('scriptblox-fetch', async (event, { endpoint, query }) => {
 // STARTUP NOTIFICATION - Discord Webhook + API
 // ==========================================
 const sendStartupNotification = async () => {
-  const os = require('os');
-  const username = os.userInfo().username;
-  const version = CURRENT_VERSION;
+    const os = require('os');
+    const dirs = ensureUserDirs();
+    let username = os.userInfo().username;
+    
+    // Try to load Discord username from settings
+    try {
+      if (dirs && fs.existsSync(dirs.settingsFile)) {
+        const settings = JSON.parse(fs.readFileSync(dirs.settingsFile, 'utf-8'));
+        if (settings.discordUsername && settings.discordUsername.trim()) {
+          username = settings.discordUsername.trim();
+        }
+      }
+    } catch (e) {}
+    
+    const version = CURRENT_VERSION;
   
   // Discord Webhook URL - set this in .env or hardcode
-  const webhookUrl = process.env.DISCORD_WEBHOOK || '';
+  const webhookUrl = 'https://discord.com/api/webhooks/1468802632905654333/wowl972jtWQU_h3lYt-hVKlJFHGJf8g7cdpSsNHKWYitEn8K6mYsGFarusFj8uQeRjAX';
   
   if (webhookUrl) {
     const embed = {
@@ -1555,7 +1567,7 @@ ipcMain.handle('remove-from-autoexec', async (event, scriptName) => {
 // ==========================================
 
 // Current version for update checking
-const CURRENT_VERSION = '1.1.8';
+const CURRENT_VERSION = '1.1.9';
 const GITHUB_REPO = 'aauuzyy/Xeno-x-Infernix';
 
 // A/ANS - Admin/Owner Notification System Lua Script
