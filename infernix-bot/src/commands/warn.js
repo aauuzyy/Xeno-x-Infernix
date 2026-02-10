@@ -23,7 +23,7 @@ module.exports = {
     try {
       const dmEmbed = new EmbedBuilder()
         .setColor(0xFBBF24)
-        .setTitle('⚠️ Warning')
+        .setTitle('Warning')
         .setDescription(`You have received a warning in **${interaction.guild.name}**`)
         .addFields(
           { name: 'Reason', value: reason },
@@ -37,7 +37,7 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setColor(0xFBBF24)
-      .setTitle('⚠️ Member Warned')
+      .setTitle('Member Warned')
       .addFields(
         { name: 'User', value: `${user.tag} (${user.id})`, inline: true },
         { name: 'Moderator', value: interaction.user.tag, inline: true },

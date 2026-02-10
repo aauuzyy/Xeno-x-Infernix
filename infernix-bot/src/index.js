@@ -26,11 +26,11 @@ const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('
 for (const file of commandFiles) {
   const filePath = path.join(commandsPath, file);
   const command = require(filePath);
-  if ('data' in command && 'execute' in command) {
+  if ('data'in command && 'execute'in command) {
     client.commands.set(command.data.name, command);
-    console.log(`✅ Loaded command: ${command.data.name}`);
+    console.log(` Loaded command: ${command.data.name}`);
   } else {
-    console.log(`⚠️ Command at ${filePath} is missing required "data" or "execute" property.`);
+    console.log(` Command at ${filePath} is missing required "data" or "execute" property.`);
   }
 }
 
@@ -46,7 +46,7 @@ for (const file of eventFiles) {
   } else {
     client.on(event.name, (...args) => event.execute(...args));
   }
-  console.log(`✅ Loaded event: ${event.name}`);
+  console.log(` Loaded event: ${event.name}`);
 }
 
 // Login

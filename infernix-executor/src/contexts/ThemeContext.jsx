@@ -110,14 +110,14 @@ const THEMES = {
 
 // Preset accent colors
 const ACCENT_PRESETS = [
-  { name: 'Fire', color: '#f97316' },
-  { name: 'Ruby', color: '#ef4444' },
-  { name: 'Emerald', color: '#22c55e' },
-  { name: 'Ocean', color: '#3b82f6' },
-  { name: 'Violet', color: '#8b5cf6' },
-  { name: 'Pink', color: '#ec4899' },
-  { name: 'Cyan', color: '#06b6d4' },
-  { name: 'Gold', color: '#eab308' },
+  { name: 'Fire', color: '#f97316'},
+  { name: 'Ruby', color: '#ef4444'},
+  { name: 'Emerald', color: '#22c55e'},
+  { name: 'Ocean', color: '#3b82f6'},
+  { name: 'Violet', color: '#8b5cf6'},
+  { name: 'Pink', color: '#ec4899'},
+  { name: 'Cyan', color: '#06b6d4'},
+  { name: 'Gold', color: '#eab308'},
 ];
 
 export function ThemeProvider({ children }) {

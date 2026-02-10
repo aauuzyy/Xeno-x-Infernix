@@ -65,7 +65,7 @@ function App() {
 
   // Lifted tab state for cross-component access
   const [tabs, setTabs] = useState([
-    { id: 1, name: 'Script 1', content: '-- Welcome to Infernix\nprint("Hello, World!")' }
+    { id: 1, name: 'Script 1', content: '-- Welcome to Infernix\nprint("Hello, World!")'}
   ]);
   const [activeTab, setActiveTab] = useState(1);
   const tabCounter = useRef(2);
@@ -152,9 +152,10 @@ function App() {
     ));
   };
 
-  const handleWriteToTab = (tabId, content) => {
-    setTabs(tabs.map(t => 
-      t.id === tabId ? { ...t, content } : t
+  // Update tab scan status for safety badges
+  const handleUpdateTabScan = (tabId, scanStatus, scanResult = null) => {
+    setTabs(tabs.map(t =>
+      t.id === tabId ? { ...t, scanStatus, scanResult } : t
     ));
   };
 
@@ -195,7 +196,7 @@ function App() {
         );
       case 'executor':
         return (
-          <EditorView 
+          <EditorView
             tabs={tabs}
             activeTab={activeTab}
             onTabChange={setActiveTab}
@@ -203,6 +204,7 @@ function App() {
             onCloseTab={handleCloseTab}
             onRenameTab={handleRenameTab}
             onCodeChange={handleCodeChange}
+            onUpdateTabScan={handleUpdateTabScan}
             onNotify={addNotification}
             clients={clients}
           />
@@ -230,7 +232,7 @@ function App() {
         );
       default:
         return (
-          <EditorView 
+          <EditorView
             tabs={tabs}
             activeTab={activeTab}
             onTabChange={setActiveTab}
@@ -238,6 +240,7 @@ function App() {
             onCloseTab={handleCloseTab}
             onRenameTab={handleRenameTab}
             onCodeChange={handleCodeChange}
+            onUpdateTabScan={handleUpdateTabScan}
             onNotify={addNotification}
             clients={clients}
           />

@@ -36,7 +36,7 @@ async function sendAnnouncementWebhook(title, message, color = '#F97316') {
     
     const embed = new EmbedBuilder()
       .setColor(color)
-      .setTitle(`📢 ${title}`)
+      .setTitle(` ${title}`)
       .setDescription(message)
       .setTimestamp();
 

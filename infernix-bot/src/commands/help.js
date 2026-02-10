@@ -10,11 +10,11 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setColor(0xF97316)
-      .setTitle('🔥 Infernix Bot Commands')
+      .setTitle('Infernix Bot Commands')
       .setDescription('Here are all available commands:')
       .addFields(
         { 
-          name: '📋 General', 
+          name: 'General', 
           value: [
             '`/ping` - Check bot latency',
             '`/infernix` - Info about Infernix Executor',
@@ -25,7 +25,7 @@ module.exports = {
           inline: false,
         },
         { 
-          name: '📢 Announcements', 
+          name: 'Announcements', 
           value: [
             '`/announce` - Send an announcement',
             '`/webhook` - Send a webhook message',
@@ -33,7 +33,7 @@ module.exports = {
           inline: false,
         },
         { 
-          name: '🛡️ Moderation', 
+          name: 'Moderation', 
           value: [
             '`/kick` - Kick a member',
             '`/ban` - Ban a member',
@@ -44,7 +44,7 @@ module.exports = {
           inline: false,
         },
       )
-      .setFooter({ text: 'Infernix Bot' })
+      .setFooter({ text: 'Infernix Bot'})
       .setTimestamp();
 
     await interaction.reply({ embeds: [embed] });

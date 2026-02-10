@@ -10,7 +10,7 @@ const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('
 for (const file of commandFiles) {
   const filePath = path.join(commandsPath, file);
   const command = require(filePath);
-  if ('data' in command && 'execute' in command) {
+  if ('data'in command && 'execute'in command) {
     commands.push(command.data.toJSON());
   }
 }
@@ -19,7 +19,7 @@ const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 
 (async () => {
   try {
-    console.log(`🔄 Refreshing ${commands.length} application (/) commands...`);
+    console.log(` Refreshing ${commands.length} application (/) commands...`);
 
     // Deploy to specific guild (faster for development)
     const data = await rest.put(
@@ -27,7 +27,7 @@ const rest = new REST().setToken(process.env.DISCORD_TOKEN);
       { body: commands },
     );
 
-    console.log(`✅ Successfully reloaded ${data.length} application (/) commands.`);
+    console.log(` Successfully reloaded ${data.length} application (/) commands.`);
   } catch (error) {
     console.error(error);
   }

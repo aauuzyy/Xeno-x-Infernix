@@ -1,12 +1,14 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
-  FolderOpen, History, Settings2, Wand2, XCircle, Bell, Shield, 
+  FolderOpen, Settings2, Wand2, XCircle, Bell, Shield, Package, 
   Download, RefreshCw, AlertTriangle, RotateCcw, CheckCircle, Zap, Palette, Sun, Moon
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import './SettingsView.css';
 import AutoExecManager from './AutoExecManager';
 import WorkspaceEditor from './WorkspaceEditor';
+import PresetManager from './PresetManager';
+
 
 // Changelog data
 const CHANGELOG = [
@@ -14,55 +16,55 @@ const CHANGELOG = [
     version: '1.1.5',
     date: 'February 2026',
     changes: [
-      '🔄 Fixed Auto-Update Installer - Now properly launches after app closes',
-      '⚡ Uses spawn with detached process for reliable updates',
+      '?? Fixed Auto-Update Installer - Now properly launches after app closes',
+      '? Uses spawn with detached process for reliable updates',
     ]
   },
   {
     version: '1.1.4',
     date: 'February 2026',
     changes: [
-      '🔧 Fixed Premium Script Execution - Large scripts now execute properly',
-      '📡 Improved Script Hub Execution - Uses IPC for reliability',
-      '📦 Fixed Content-Length headers for script payloads',
+      '?? Fixed Premium Script Execution - Large scripts now execute properly',
+      '?? Improved Script Hub Execution - Uses IPC for reliability',
+      '?? Fixed Content-Length headers for script payloads',
     ]
   },
   {
     version: '1.1.3',
     date: 'February 2026',
     changes: [
-      '🔄 Fixed Auto-Update - Updates now install correctly',
-      '📂 Drag & Drop Scripts - Drop .lua/.txt files onto editor',
-      '🔍 Auto-Lint on file drop',
+      '?? Fixed Auto-Update - Updates now install correctly',
+      '?? Drag & Drop Scripts - Drop .lua/.txt files onto editor',
+      '?? Auto-Lint on file drop',
     ]
   },
   {
     version: '1.1.2',
     date: 'February 2026',
     changes: [
-      '📂 Drag & Drop Scripts - Drop .lua/.txt files directly onto editor',
-      '🔍 Auto-Lint - Automatic syntax checking on file drop',
-      '🔧 Fixed Debug Console setting not being respected',
+      '?? Drag & Drop Scripts - Drop .lua/.txt files directly onto editor',
+      '?? Auto-Lint - Automatic syntax checking on file drop',
+      '?? Fixed Debug Console setting not being respected',
     ]
   },
   {
     version: '1.1.1',
     date: 'February 2026',
     changes: [
-      '🔥 Custom Update UI - Fire-themed in-app update modal',
-      '📥 In-App Updates - Downloads without opening browser',
-      '🔄 Fixed GitHub API Redirect issue for updates',
+      '?? Custom Update UI - Fire-themed in-app update modal',
+      '?? In-App Updates - Downloads without opening browser',
+      '?? Fixed GitHub API Redirect issue for updates',
     ]
   },
   {
     version: '1.0.9',
     date: 'February 2026',
     changes: [
-      '🎨 Custom Themes - Dark, Light, Midnight modes',
-      '🎨 Accent Color Picker with presets',
-      '🌈 RGB Color Shift animation',
-      '🔧 Fixed AutoExec to actually work on attach',
-      '⚡ Auto-Attach with AutoExec support',
+      '?? Custom Themes - Dark, Light, Midnight modes',
+      '?? Accent Color Picker with presets',
+      '?? RGB Color Shift animation',
+      '?? Fixed AutoExec to actually work on attach',
+      '? Auto-Attach with AutoExec support',
     ]
   },
   {
@@ -124,6 +126,8 @@ function SettingsView({ tabs, onNewTab, onSwitchToExecutor }) {
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [showAutoExec, setShowAutoExec] = useState(false);
   const [showWorkspace, setShowWorkspace] = useState(false);
+  const [showPresets, setShowPresets] = useState(false);
+
   const [killing, setKilling] = useState(false);
   const [updateInfo, setUpdateInfo] = useState(null);
   const [checkingUpdates, setCheckingUpdates] = useState(false);
@@ -261,7 +265,7 @@ function SettingsView({ tabs, onNewTab, onSwitchToExecutor }) {
   };
 
   const getToggleClass = (isActive) => {
-    return 'toggle' + (isActive ? ' active' : '');
+    return 'toggle'+ (isActive ? 'active': '');
   };
 
   return (
@@ -388,21 +392,21 @@ function SettingsView({ tabs, onNewTab, onSwitchToExecutor }) {
           </div>
           <div className="theme-buttons">
             <button
-              className={`theme-btn ${themeMode === 'dark' ? 'active' : ''}`}
+              className={`theme-btn ${themeMode === 'dark'? 'active': ''}`}
               onClick={() => setThemeMode('dark')}
             >
               <Moon size={14} />
               Dark
             </button>
             <button
-              className={`theme-btn ${themeMode === 'light' ? 'active' : ''}`}
+              className={`theme-btn ${themeMode === 'light'? 'active': ''}`}
               onClick={() => setThemeMode('light')}
             >
               <Sun size={14} />
               Light
             </button>
             <button
-              className={`theme-btn ${themeMode === 'midnight' ? 'active' : ''}`}
+              className={`theme-btn ${themeMode === 'midnight'? 'active': ''}`}
               onClick={() => setThemeMode('midnight')}
             >
               <Moon size={14} />
@@ -430,7 +434,7 @@ function SettingsView({ tabs, onNewTab, onSwitchToExecutor }) {
           {accentPresets.map((preset) => (
             <button
               key={preset.name}
-              className={`color-preset ${accentColor === preset.color ? 'active' : ''}`}
+              className={`color-preset ${accentColor === preset.color ? 'active': ''}`}
               style={{ backgroundColor: preset.color }}
               onClick={() => setAccentColor(preset.color)}
               title={preset.name}
@@ -508,7 +512,7 @@ function SettingsView({ tabs, onNewTab, onSwitchToExecutor }) {
           </button>
         </div>
 
-        <div className="folders-row" style={{ marginTop: '12px' }}>
+        <div className="folders-row" style={{ marginTop: '12px'}}>
           <button className="folder-btn" onClick={enableANS}>
             <Bell size={14} />
             Activate A/ANS
@@ -519,21 +523,21 @@ function SettingsView({ tabs, onNewTab, onSwitchToExecutor }) {
           </button>
         </div>
 
-        <div className="setting-item" style={{ marginTop: '12px' }}>
+        <div className="setting-item" style={{ marginTop: '12px'}}>
           <div className="setting-info">
             <span className="setting-label">Banwave Status</span>
             <span className="setting-desc">
-              {banwaveStatus?.active ? '?? ACTIVE - BE CAREFUL!' : '? All Clear'}
+              {banwaveStatus?.active ? '?? ACTIVE - BE CAREFUL!': '? All Clear'}
             </span>
           </div>
           <button 
             className="folder-btn secondary" 
             onClick={checkBanwaveStatus}
             disabled={checkingBanwave}
-            style={{ flex: 'none', minWidth: 'auto', padding: '6px 12px' }}
+            style={{ flex: 'none', minWidth: 'auto', padding: '6px 12px'}}
           >
-            <RefreshCw size={12} className={checkingBanwave ? 'spinning' : ''} />
-            {checkingBanwave ? 'Checking...' : 'Refresh'}
+            <RefreshCw size={12} className={checkingBanwave ? 'spinning': ''} />
+            {checkingBanwave ? 'Checking...': 'Refresh'}
           </button>
         </div>
       </div>
@@ -543,15 +547,15 @@ function SettingsView({ tabs, onNewTab, onSwitchToExecutor }) {
         <div className="folders-row">
           <button className="folder-btn danger" onClick={handleKillRoblox} disabled={killing}>
             <XCircle size={14} />
-            {killing ? 'Killing...' : 'Kill Roblox'}
+            {killing ? 'Killing...': 'Kill Roblox'}
           </button>
           <button 
             className="folder-btn" 
             onClick={checkForUpdates} 
             disabled={checkingUpdates}
           >
-            <RefreshCw size={14} className={checkingUpdates ? 'spinning' : ''} />
-            {checkingUpdates ? 'Checking...' : 'Check Updates'}
+            <RefreshCw size={14} className={checkingUpdates ? 'spinning': ''} />
+            {checkingUpdates ? 'Checking...': 'Check Updates'}
           </button>
         </div>
       </div>
@@ -566,9 +570,13 @@ function SettingsView({ tabs, onNewTab, onSwitchToExecutor }) {
           <button className="folder-btn" onClick={() => setShowWorkspace(true)}>
             <Wand2 size={14} />
             Open Workspace
-          </button>
-        </div>
-        <div className="folders-row" style={{ marginTop: '8px' }}>
+            </button>
+            <button className="folder-btn" onClick={() => setShowPresets(true)}>
+              <Package size={14} />
+              Manage Presets
+            </button>
+          </div>
+          <div className="folders-row" style={{ marginTop: '8px'}}>
           <button className="folder-btn secondary" onClick={() => openFolder('autoexec')}>
             <FolderOpen size={14} />
             Autoexec
@@ -601,7 +609,7 @@ function SettingsView({ tabs, onNewTab, onSwitchToExecutor }) {
           </button>
         </div>
 
-        <div className="folders-row" style={{ marginTop: '12px' }}>
+        <div className="folders-row" style={{ marginTop: '12px'}}>
           <button className="folder-btn danger" onClick={handleResetSettings}>
             <RotateCcw size={14} />
             Reset All Settings
@@ -613,7 +621,7 @@ function SettingsView({ tabs, onNewTab, onSwitchToExecutor }) {
         <div className="about-info">
           <p><strong>Infernix Executor</strong></p>
           <p>Version {currentVersion}</p>
-          <p className="muted">© 2026 Infernix Team</p>
+          <p className="muted">� 2026 Infernix Team</p>
         </div>
       </div>
 
@@ -628,6 +636,25 @@ function SettingsView({ tabs, onNewTab, onSwitchToExecutor }) {
         <WorkspaceEditor
           onDone={handleWorkspaceDone}
           onClose={() => setShowWorkspace(false)}
+        />
+      )}
+
+      {showPresets && (
+        <PresetManager
+          isOpen={showPresets}
+          onClose={() => setShowPresets(false)}
+          onLoad={(preset) => {
+            if (preset.settings) setSettings(prev => ({ ...prev, ...preset.settings }));
+            if (preset.theme) {
+              if (preset.theme.themeMode) setThemeMode(preset.theme.themeMode);
+              if (preset.theme.accentColor) setAccentColor(preset.theme.accentColor);
+              if (preset.theme.colorShift !== undefined) setColorShift(preset.theme.colorShift);
+            }
+            alert('Preset loaded successfully!');
+          }}
+          currentSettings={settings}
+          currentTheme={{ themeMode, accentColor, colorShift }}
+          currentTabs={tabs || []}
         />
       )}
     </div>

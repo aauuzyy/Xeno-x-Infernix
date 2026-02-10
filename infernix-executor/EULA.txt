@@ -1,0 +1,8 @@
+END USER LICENSE AGREEMENT (EULA)
+
+By installing or using Infernix, you agree to the following terms:
+
+1. This software is proprietary and confidential.
+2. You may not copy, distribute, modify, or reverse engineer any part of Infernix.
+3. All rights reserved by the Infernix Team.
+4. Violation of these terms may result in legal action.

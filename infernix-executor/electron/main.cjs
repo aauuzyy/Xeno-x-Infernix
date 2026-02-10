@@ -1,8 +1,9 @@
-const { app, BrowserWindow, ipcMain, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, clipboard } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
+const crypto = require('crypto');
 const { exec } = require('child_process');
 
 let mainWindow = null;
@@ -10,8 +11,58 @@ let executorAddon = null;
 // Check if we're in dev mode - only use dev server if explicitly set
 const isDev = process.env.NODE_ENV === 'development';
 
+// VirusTotal API Configuration
+const VIRUSTOTAL_API_KEY = '0bbe658ca1c2c83aa406c708c5d81364c25ab03b4a2e266d8b995066395ad49a';
+const VIRUSTOTAL_SCAN_CACHE = new Map(); // Cache scan results
+const VIRUSTOTAL_CACHE_TTL = 3600000; // 1 hour cache
+
 // Store for client game info received from Lua scripts
 let clientGameInfoStore = {};
+// Execution History Storage
+const EXECUTION_HISTORY_FILE = 'execution-history.json';
+let executionHistory = [];
+const MAX_HISTORY_ITEMS = 100;
+
+const loadExecutionHistory = () => {
+  try {
+    const dirs = ensureUserDirs();
+    if (!dirs) return [];
+    const historyPath = path.join(dirs.appDataDir, EXECUTION_HISTORY_FILE);
+    if (fs.existsSync(historyPath)) {
+      executionHistory = JSON.parse(fs.readFileSync(historyPath, 'utf-8'));
+    }
+  } catch (e) {
+    executionHistory = [];
+  }
+  return executionHistory;
+};
+
+const saveExecutionHistory = () => {
+  try {
+    const dirs = ensureUserDirs();
+    if (!dirs) return;
+    const historyPath = path.join(dirs.appDataDir, EXECUTION_HISTORY_FILE);
+    fs.writeFileSync(historyPath, JSON.stringify(executionHistory.slice(-MAX_HISTORY_ITEMS), null, 2));
+  } catch (e) {}
+};
+
+const addToExecutionHistory = (scriptName, script, success, client = null) => {
+  const entry = {
+    id: Date.now().toString() + '-' + Math.random().toString(36).substr(2, 9),
+    scriptName: scriptName || 'Untitled Script',
+    script: script.substring(0, 2000),
+    success: success,
+    timestamp: Date.now(),
+    client: client
+  };
+  executionHistory.push(entry);
+  if (executionHistory.length > MAX_HISTORY_ITEMS) {
+    executionHistory = executionHistory.slice(-MAX_HISTORY_ITEMS);
+  }
+  saveExecutionHistory();
+  return entry;
+};
+
 
 // Internal HTTP server to receive data from Lua scripts (port 3111)
 const INTERNAL_PORT = 3111;
@@ -43,10 +94,32 @@ const internalServer = http.createServer((req, res) => {
       }
     });
     return;
-  }
-  
-  res.writeHead(404);
-  res.end('Not found');
+  }    // Clipboard endpoint - Lua scripts POST here to copy text
+    if (req.method === 'POST' && req.url === '/clipboard') {
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => {
+        try {
+          const data = JSON.parse(body);
+          if (data.text) {
+            clipboard.writeText(data.text);
+            console.log('[Infernix] Clipboard set:', data.text.substring(0, 50) + (data.text.length > 50 ? '...' : ''));
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true }));
+          } else {
+            res.writeHead(400);
+            res.end('Missing text');
+          }
+        } catch (e) {
+          res.writeHead(400);
+          res.end('Invalid JSON');
+        }
+      });
+      return;
+    }
+
+    res.writeHead(404);
+    res.end('Not found');
 });
 
 internalServer.listen(INTERNAL_PORT, '127.0.0.1', () => {});
@@ -212,7 +285,24 @@ async function createWindow() {
         }
       }
     } catch {}
-    
+
+    // Report usage to website (anonymous - just for "recently used" display)
+    setTimeout(async () => {
+      try {
+        const username = require('os').userInfo().username || 'User';
+        await fetch('https://infernix.vercel.app/api/recent-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: username.slice(0, 3) + '...',
+            version: APP_VERSION,
+          }),
+        });
+      } catch (e) {
+        // Silent fail - not critical
+      }
+    }, 3000);
+
     // Auto-update check on startup
     setTimeout(async () => {
       try {
@@ -260,6 +350,340 @@ ipcMain.on('window-close', async () => {
   } catch (e) {}
   if (mainWindow) mainWindow.close();
 });
+
+// ===== VirusTotal Script Scanning =====
+
+// Calculate SHA-256 hash of script content
+function calculateScriptHash(script) {
+  return crypto.createHash('sha256').update(script, 'utf8').digest('hex');
+}
+
+// Scan script with VirusTotal
+async function scanScriptWithVirusTotal(script, scriptName = 'script.lua') {
+  const hash = calculateScriptHash(script);
+  
+  // Check cache first
+  const cached = VIRUSTOTAL_SCAN_CACHE.get(hash);
+  if (cached && (Date.now() - cached.timestamp) < VIRUSTOTAL_CACHE_TTL) {
+    console.log('[VirusTotal] Using cached result for', scriptName);
+    return cached.result;
+  }
+
+  return new Promise((resolve) => {
+    // First, try to look up by hash (faster, no upload needed)
+    const options = {
+      hostname: 'www.virustotal.com',
+      path: `/api/v3/files/${hash}`,
+      method: 'GET',
+      headers: {
+        'x-apikey': VIRUSTOTAL_API_KEY,
+        'Accept': 'application/json',
+      },
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          if (res.statusCode === 200) {
+            const json = JSON.parse(data);
+            const stats = json.data?.attributes?.last_analysis_stats || {};
+            const analysisResults = json.data?.attributes?.last_analysis_results || {};
+            
+            // Extract detection names from engines that flagged the file
+            const detections = [];
+            for (const [engineName, engineResult] of Object.entries(analysisResults)) {
+              if (engineResult.category === 'malicious' || engineResult.category === 'suspicious') {
+                detections.push({
+                  engine: engineName,
+                  category: engineResult.category,
+                  result: engineResult.result || engineResult.category,
+                });
+              }
+            }
+            
+            const result = {
+              scanned: true,
+              hash,
+              malicious: stats.malicious || 0,
+              suspicious: stats.suspicious || 0,
+              harmless: stats.harmless || 0,
+              undetected: stats.undetected || 0,
+              totalEngines: (stats.malicious || 0) + (stats.suspicious || 0) + (stats.harmless || 0) + (stats.undetected || 0),
+              safe: (stats.malicious || 0) === 0 && (stats.suspicious || 0) === 0,
+              verdict: (stats.malicious || 0) > 0 ? 'malicious' :
+                       (stats.suspicious || 0) > 0 ? 'suspicious' : 'clean',
+              detections: detections,
+            };
+
+            // Cache result
+            VIRUSTOTAL_SCAN_CACHE.set(hash, { result, timestamp: Date.now() });
+            resolve(result);
+          } else if (res.statusCode === 404) {
+            // File not in database, upload it for scanning
+            uploadAndScanScript(script, scriptName, hash).then(resolve);
+          } else {
+            resolve({ scanned: false, error: 'API error', statusCode: res.statusCode });
+          }
+        } catch (e) {
+          resolve({ scanned: false, error: e.message });
+        }
+      });
+    });
+
+    req.on('error', (e) => {
+      resolve({ scanned: false, error: e.message });
+    });
+
+    req.end();
+  });
+}
+
+// Upload script to VirusTotal for scanning
+async function uploadAndScanScript(script, scriptName, hash) {
+  return new Promise((resolve) => {
+    const boundary = '----WebKitFormBoundary' + Math.random().toString(36).substring(2);
+    const scriptBuffer = Buffer.from(script, 'utf-8');
+    
+    const body = Buffer.concat([
+      Buffer.from(`--${boundary}\r\n`),
+      Buffer.from(`Content-Disposition: form-data; name="file"; filename="${scriptName}"\r\n`),
+      Buffer.from('Content-Type: text/plain\r\n\r\n'),
+      scriptBuffer,
+      Buffer.from(`\r\n--${boundary}--\r\n`),
+    ]);
+
+    const options = {
+      hostname: 'www.virustotal.com',
+      path: '/api/v3/files',
+      method: 'POST',
+      headers: {
+        'x-apikey': VIRUSTOTAL_API_KEY,
+        'Content-Type': `multipart/form-data; boundary=${boundary}`,
+        'Content-Length': body.length,
+      },
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          if (res.statusCode === 200) {
+            const json = JSON.parse(data);
+            const analysisId = json.data?.id;
+            
+            if (analysisId) {
+              // Poll for results (VT takes time to scan)
+              const result = {
+                scanned: true,
+                pending: true,
+                hash,
+                analysisId,
+                verdict: 'scanning',
+                message: 'Script uploaded for scanning. Results pending.',
+              };
+              VIRUSTOTAL_SCAN_CACHE.set(hash, { result, timestamp: Date.now() });
+              resolve(result);
+            } else {
+              resolve({ scanned: false, error: 'No analysis ID returned' });
+            }
+          } else {
+            resolve({ scanned: false, error: 'Upload failed', statusCode: res.statusCode });
+          }
+        } catch (e) {
+          resolve({ scanned: false, error: e.message });
+        }
+      });
+    });
+
+    req.on('error', (e) => {
+      resolve({ scanned: false, error: e.message });
+    });
+
+    req.write(body);
+    req.end();
+  });
+}
+
+// Check analysis status for pending scans
+async function checkVirusTotalAnalysis(analysisId) {
+  return new Promise((resolve) => {
+    const options = {
+      hostname: 'www.virustotal.com',
+      path: `/api/v3/analyses/${analysisId}`,
+      method: 'GET',
+      headers: {
+        'x-apikey': VIRUSTOTAL_API_KEY,
+        'Accept': 'application/json',
+      },
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          const status = json.data?.attributes?.status;
+          const stats = json.data?.attributes?.stats || {};
+          
+          if (status === 'completed') {
+            resolve({
+              completed: true,
+              malicious: stats.malicious || 0,
+              suspicious: stats.suspicious || 0,
+              harmless: stats.harmless || 0,
+              undetected: stats.undetected || 0,
+              safe: (stats.malicious || 0) === 0 && (stats.suspicious || 0) === 0,
+              verdict: (stats.malicious || 0) > 0 ? 'malicious' : 
+                       (stats.suspicious || 0) > 0 ? 'suspicious' : 'clean',
+            });
+          } else {
+            resolve({ completed: false, status });
+          }
+        } catch (e) {
+          resolve({ completed: false, error: e.message });
+        }
+      });
+    });
+
+    req.on('error', (e) => {
+      resolve({ completed: false, error: e.message });
+    });
+
+    req.end();
+  });
+}
+
+// IPC Handler for script scanning
+ipcMain.handle('virustotal-scan', async (event, { script, scriptName }) => {
+  console.log('[VirusTotal] Scanning script:', scriptName);
+  return await scanScriptWithVirusTotal(script, scriptName);
+});
+
+// IPC Handler to check pending analysis
+ipcMain.handle('virustotal-check', async (event, { analysisId }) => {
+  return await checkVirusTotalAnalysis(analysisId);
+});
+
+// IPC Handler to get cached result by hash
+ipcMain.handle('virustotal-cached', async (event, { script }) => {
+  const hash = calculateScriptHash(script);
+  const cached = VIRUSTOTAL_SCAN_CACHE.get(hash);
+  if (cached && (Date.now() - cached.timestamp) < VIRUSTOTAL_CACHE_TTL) {
+    return cached.result;
+  }
+  return null;
+});
+
+// IPC Handler for URL scanning
+ipcMain.handle('virustotal-scan-url', async (event, { url }) => {
+  console.log('[VirusTotal] Scanning URL:', url);
+  return await scanUrlWithVirusTotal(url);
+});
+
+// Scan URL with VirusTotal
+async function scanUrlWithVirusTotal(urlToScan) {
+  // Check cache first
+  const urlHash = crypto.createHash('sha256').update(urlToScan).digest('hex');
+  const cached = VIRUSTOTAL_SCAN_CACHE.get('url:' + urlHash);
+  if (cached && (Date.now() - cached.timestamp) < VIRUSTOTAL_CACHE_TTL) {
+    return cached.result;
+  }
+
+  return new Promise((resolve) => {
+    // Encode URL for API
+    const encodedUrl = Buffer.from(urlToScan).toString('base64').replace(/=/g, '');
+    
+    const options = {
+      hostname: 'www.virustotal.com',
+      path: `/api/v3/urls/${encodedUrl}`,
+      method: 'GET',
+      headers: {
+        'x-apikey': VIRUSTOTAL_API_KEY,
+        'Accept': 'application/json',
+      },
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          if (res.statusCode === 200) {
+            const json = JSON.parse(data);
+            const stats = json.data?.attributes?.last_analysis_stats || {};
+            const result = {
+              scanned: true,
+              url: urlToScan,
+              malicious: stats.malicious || 0,
+              suspicious: stats.suspicious || 0,
+              harmless: stats.harmless || 0,
+              undetected: stats.undetected || 0,
+              safe: (stats.malicious || 0) === 0 && (stats.suspicious || 0) === 0,
+            };
+            
+            VIRUSTOTAL_SCAN_CACHE.set('url:' + urlHash, { result, timestamp: Date.now() });
+            resolve(result);
+          } else if (res.statusCode === 404) {
+            // URL not in database, submit for scanning
+            submitUrlForScan(urlToScan, urlHash).then(resolve);
+          } else {
+            resolve({ scanned: false, error: 'API error', statusCode: res.statusCode });
+          }
+        } catch (e) {
+          resolve({ scanned: false, error: e.message });
+        }
+      });
+    });
+
+    req.on('error', (e) => resolve({ scanned: false, error: e.message }));
+    req.end();
+  });
+}
+
+// Submit URL to VirusTotal for scanning
+async function submitUrlForScan(urlToScan, urlHash) {
+  return new Promise((resolve) => {
+    const postData = `url=${encodeURIComponent(urlToScan)}`;
+    
+    const options = {
+      hostname: 'www.virustotal.com',
+      path: '/api/v3/urls',
+      method: 'POST',
+      headers: {
+        'x-apikey': VIRUSTOTAL_API_KEY,
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(postData),
+      },
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          if (res.statusCode === 200) {
+            // URL submitted, return pending status
+            const result = { scanned: true, pending: true, url: urlToScan };
+            VIRUSTOTAL_SCAN_CACHE.set('url:' + urlHash, { result, timestamp: Date.now() });
+            resolve(result);
+          } else {
+            resolve({ scanned: false, error: 'Submit failed' });
+          }
+        } catch (e) {
+          resolve({ scanned: false, error: e.message });
+        }
+      });
+    });
+
+    req.on('error', (e) => resolve({ scanned: false, error: e.message }));
+    req.write(postData);
+    req.end();
+  });
+}
 
 // AI Chat Completion Handler
 ipcMain.handle('ai-generate', async (event, { messages }) => {
@@ -871,6 +1295,30 @@ const runAutoExecScripts = async () => {
       console.log('[Infernix] AutoExec not enabled in settings');
       return;
     }
+    
+    // Re-read settings right before execution to catch any last-second disables
+    try {
+      const freshSettings = JSON.parse(fs.readFileSync(dirs.settingsFile, 'utf-8'));
+      if (freshSettings.autoExecute !== true) {
+        console.log('[Infernix] AutoExec was disabled before execution - aborting');
+        return;
+      }
+    } catch (e) {
+      console.log('[Infernix] Could not re-read settings, aborting autoexec for safety');
+      return;
+    }
+    
+    // Re-read settings right before execution to catch any last-second disables
+    try {
+      const freshSettings = JSON.parse(fs.readFileSync(dirs.settingsFile, 'utf-8'));
+      if (freshSettings.autoExecute !== true) {
+        console.log('[Infernix] AutoExec was disabled before execution - aborting');
+        return;
+      }
+    } catch (e) {
+      console.log('[Infernix] Could not re-read settings, aborting autoexec for safety');
+      return;
+    }
 
     const files = fs.readdirSync(dirs.autoexecDir);
     const scripts = files.filter(f => f.endsWith('.lua') || f.endsWith('.txt'));
@@ -1021,7 +1469,7 @@ ipcMain.handle('executor-attach', async () => {
 });
 
 // Execute via HTTP to Xeno's local server (port 3110)
-ipcMain.handle('executor-execute', async (event, { script, clients }) => {
+ipcMain.handle('executor-execute', async (event, { script, clients, scriptName }) => {
   if (!script || typeof script !== 'string') {
     return { ok: false, error: 'Script must be a string' };
   }
@@ -1031,7 +1479,24 @@ ipcMain.handle('executor-execute', async (event, { script, clients }) => {
     const clientPids = Array.isArray(clients) ? clients : [];
     
     return new Promise((resolve) => {
-      const postData = script;
+      // Prepend clipboard support to scripts
+        const clipboardHelper = `-- Infernix Clipboard Support
+if not _G.InfernixClipboard then
+  _G.InfernixClipboard = true
+  local HttpService = game:GetService("HttpService")
+  local oldSetClipboard = setclipboard
+  getgenv().setclipboard = function(text)
+    if oldSetClipboard then pcall(oldSetClipboard, text) end
+    pcall(function()
+      local data = HttpService:JSONEncode({text = tostring(text)})
+      local req = (syn and syn.request) or request or http_request or (http and http.request)
+      if req then req({Url = "http://127.0.0.1:3111/clipboard", Method = "POST", Headers = {["Content-Type"] = "application/json"}, Body = data}) end
+    end)
+  end
+  getgenv().toclipboard = setclipboard
+end
+`;
+        const postData = clipboardHelper + "\n" + script;
       const options = {
         hostname: 'localhost',
         port: 3110,
@@ -1049,6 +1514,7 @@ ipcMain.handle('executor-execute', async (event, { script, clients }) => {
         res.on('data', (chunk) => { data += chunk; });
         res.on('end', () => {
           if (res.statusCode === 200) {
+            addToExecutionHistory(scriptName, script, true);
             resolve({ ok: true });
           } else {
             resolve({ ok: false, error: `HTTP ${res.statusCode}` });
@@ -1270,6 +1736,92 @@ ipcMain.handle('delete-script', async (event, filePath) => {
     return { ok: false, error: e.message };
   }
 });
+
+  // ==========================================
+  // PRESET MANAGEMENT
+  // ==========================================
+  
+  // Get all presets
+  ipcMain.handle('get-presets', async () => {
+    const dirs = ensureUserDirs();
+    if (!dirs) return [];
+    
+    const presetsDir = path.join(dirs.base, 'presets');
+    fs.mkdirSync(presetsDir, { recursive: true });
+    
+    try {
+      const files = fs.readdirSync(presetsDir).filter(f => f.endsWith('.json'));
+      return files.map(file => {
+        const filePath = path.join(presetsDir, file);
+        try {
+          const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+          return {
+            name: data.name || file.replace('.json', ''),
+            description: data.description || '',
+            filePath,
+            createdAt: data.createdAt || null,
+            settings: data.settings || {},
+            theme: data.theme || {},
+            tabs: data.tabs || []
+          };
+        } catch (e) {
+          return { name: file.replace('.json', ''), filePath, error: true };
+        }
+      });
+    } catch (e) {
+      return [];
+    }
+  });
+  
+  // Save a preset
+  ipcMain.handle('save-preset', async (event, presetData) => {
+    const dirs = ensureUserDirs();
+    if (!dirs) return { ok: false, error: 'No user dirs' };
+    
+    const presetsDir = path.join(dirs.base, 'presets');
+    fs.mkdirSync(presetsDir, { recursive: true });
+    
+    const { name, description, settings, theme, tabs } = presetData;
+    const safeName = name.replace(/[^a-zA-Z0-9_-]/g, '_');
+    const filePath = path.join(presetsDir, safeName + '.json');
+    
+    try {
+      const data = {
+        name,
+        description: description || '',
+        createdAt: new Date().toISOString(),
+        settings: settings || {},
+        theme: theme || {},
+        tabs: tabs || []
+      };
+      fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+      return { ok: true, filePath };
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
+  });
+  
+  // Load a preset
+  ipcMain.handle('load-preset', async (event, filePath) => {
+    try {
+      const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      return { ok: true, preset: data };
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
+  });
+  
+  // Delete a preset
+  ipcMain.handle('delete-preset', async (event, filePath) => {
+    try {
+      fs.unlinkSync(filePath);
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
+  });
+
+
 
 // Save settings
 ipcMain.handle('save-settings', async (event, settings) => {
@@ -1566,7 +2118,7 @@ ipcMain.handle('remove-from-autoexec', async (event, scriptName) => {
 // ==========================================
 
 // Current version for update checking
-const CURRENT_VERSION = '1.1.9';
+const CURRENT_VERSION = '1.2.5';
 const GITHUB_REPO = 'aauuzyy/Xeno-x-Infernix';
 
 // A/ANS - Admin/Owner Notification System Lua Script
@@ -2103,6 +2655,29 @@ ipcMain.handle('abs-emergency-shutdown', async () => {
 });
 
 // ==========================================
+
+// ==========================================
+// EXECUTION HISTORY
+// ==========================================
+
+ipcMain.handle('get-execution-history', async () => {
+  loadExecutionHistory();
+  return executionHistory.slice().reverse(); // Return newest first
+});
+
+ipcMain.handle('clear-execution-history', async () => {
+  executionHistory = [];
+  saveExecutionHistory();
+  return { ok: true };
+});
+
+ipcMain.handle('delete-history-items', async (event, ids) => {
+  if (!Array.isArray(ids)) return { ok: false };
+  executionHistory = executionHistory.filter(item => !ids.includes(item.id));
+  saveExecutionHistory();
+  return { ok: true };
+});
+
 // END V1.0.8 FEATURES
 // ==========================================
 

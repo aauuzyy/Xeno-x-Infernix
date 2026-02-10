@@ -156,7 +156,7 @@ function ClientManager({ clients, onNotify }) {
       onNotify?.({
         type: 'success',
         title: 'Unattached',
-        message: 'Cleaned up ' + selectedPids.size + ' client(s) - UI destroyed'
+        message: 'Cleaned up '+ selectedPids.size + 'client(s) - UI destroyed'
       });
       setSelectedPids(new Set());
     } catch (e) {
@@ -317,7 +317,7 @@ function ClientManager({ clients, onNotify }) {
             return (
               <div 
                 key={parsed.pid || idx} 
-                className={`client-card ${isSelected ? 'selected' : ''}`}
+                className={`client-card ${isSelected ? 'selected': ''}`}
                 onClick={() => toggleSelect(parsed.pid)}
               >
                 <div className="client-select">
@@ -358,7 +358,7 @@ function ClientManager({ clients, onNotify }) {
                 </div>
 
                 <div className={`client-status ${statusInfo.color}`}>
-                  <StatusIcon size={12} className={statusInfo.color === 'attaching' || statusInfo.color === 'waiting' ? 'spinning' : ''} />
+                  <StatusIcon size={12} className={statusInfo.color === 'attaching'|| statusInfo.color === 'waiting'? 'spinning': ''} />
                   <span>{statusInfo.label}</span>
                 </div>
               </div>

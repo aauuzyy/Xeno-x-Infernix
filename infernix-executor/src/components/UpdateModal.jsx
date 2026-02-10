@@ -49,7 +49,7 @@ const UpdateModal = ({ isOpen, onClose, updateInfo, isBlocking }) => {
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ''+ sizes[i];
   };
 
   const handleUpdateNow = async () => {
@@ -192,7 +192,7 @@ const UpdateModal = ({ isOpen, onClose, updateInfo, isBlocking }) => {
             <line x1="12" y1="8" x2="12" y2="12"/>
             <line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
-          <span>{isBlocking ? 'This update is required to continue using Infernix' : 'Updates include important fixes and new features'}</span>
+          <span>{isBlocking ? 'This update is required to continue using Infernix': 'Updates include important fixes and new features'}</span>
         </div>
       </div>
     </div>

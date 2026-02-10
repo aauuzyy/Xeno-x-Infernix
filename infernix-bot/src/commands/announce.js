@@ -21,12 +21,12 @@ module.exports = {
         .setDescription('Embed color')
         .setRequired(false)
         .addChoices(
-          { name: '🔥 Fire Orange', value: '#F97316' },
-          { name: '🔴 Red', value: '#EF4444' },
-          { name: '🟢 Green', value: '#22C55E' },
-          { name: '🔵 Blue', value: '#3B82F6' },
-          { name: '🟡 Yellow', value: '#EAB308' },
-          { name: '🟣 Purple', value: '#A855F7' },
+          { name: 'Fire Orange', value: '#F97316'},
+          { name: 'Red', value: '#EF4444'},
+          { name: 'Green', value: '#22C55E'},
+          { name: 'Blue', value: '#3B82F6'},
+          { name: 'Yellow', value: '#EAB308'},
+          { name: 'Purple', value: '#A855F7'},
         ))
     .addBooleanOption(option =>
       option.setName('ping')
@@ -45,23 +45,23 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setColor(color)
-      .setTitle(`📢 ${title}`)
+      .setTitle(` ${title}`)
       .setDescription(message)
       .setFooter({ text: `Announced by ${interaction.user.tag}`, iconURL: interaction.user.displayAvatarURL() })
       .setTimestamp();
 
     try {
-      const content = ping ? '@everyone' : '';
+      const content = ping ? '@everyone': '';
       await channel.send({ content, embeds: [embed] });
 
       await interaction.reply({
-        content: `✅ Announcement sent to ${channel}!`,
+        content: ` Announcement sent to ${channel}!`,
         ephemeral: true,
       });
     } catch (error) {
       console.error('Failed to send announcement:', error);
       await interaction.reply({
-        content: '❌ Failed to send announcement. Check bot permissions!',
+        content: 'Failed to send announcement. Check bot permissions!',
         ephemeral: true,
       });
     }

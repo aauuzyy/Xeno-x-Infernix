@@ -24,7 +24,7 @@ function SaveScriptModal({ isOpen, onClose, onSave, defaultName }) {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey && name.trim()) {
+    if (e.key === 'Enter'&& !e.shiftKey && name.trim()) {
       handleSave();
     }
     if (e.key === 'Escape') {
@@ -87,7 +87,7 @@ function SaveScriptModal({ isOpen, onClose, onSave, defaultName }) {
             onClick={handleSave}
             disabled={!name.trim() || saving}
           >
-            {saving ? 'Saving...' : 'Save Script'}
+            {saving ? 'Saving...': 'Save Script'}
           </button>
         </div>
       </div>

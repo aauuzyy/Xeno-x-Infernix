@@ -21,15 +21,15 @@ module.exports = {
     const member = interaction.guild.members.cache.get(user.id);
 
     if (!member) {
-      return interaction.reply({ content: '❌ User not found in this server.', ephemeral: true });
+      return interaction.reply({ content: 'User not found in this server.', ephemeral: true });
     }
 
     if (!member.kickable) {
-      return interaction.reply({ content: '❌ I cannot kick this user. They may have higher permissions than me.', ephemeral: true });
+      return interaction.reply({ content: 'I cannot kick this user. They may have higher permissions than me.', ephemeral: true });
     }
 
     if (member.id === interaction.user.id) {
-      return interaction.reply({ content: '❌ You cannot kick yourself!', ephemeral: true });
+      return interaction.reply({ content: 'You cannot kick yourself!', ephemeral: true });
     }
 
     try {
@@ -37,7 +37,7 @@ module.exports = {
       try {
         const dmEmbed = new EmbedBuilder()
           .setColor(0xEF4444)
-          .setTitle('👢 You have been kicked')
+          .setTitle('You have been kicked')
           .setDescription(`You have been kicked from **${interaction.guild.name}**`)
           .addFields({ name: 'Reason', value: reason })
           .setTimestamp();
@@ -50,7 +50,7 @@ module.exports = {
 
       const embed = new EmbedBuilder()
         .setColor(0xEF4444)
-        .setTitle('👢 Member Kicked')
+        .setTitle('Member Kicked')
         .addFields(
           { name: 'User', value: `${user.tag} (${user.id})`, inline: true },
           { name: 'Moderator', value: interaction.user.tag, inline: true },
@@ -66,7 +66,7 @@ module.exports = {
 
     } catch (error) {
       console.error('Kick error:', error);
-      await interaction.reply({ content: '❌ Failed to kick user.', ephemeral: true });
+      await interaction.reply({ content: 'Failed to kick user.', ephemeral: true });
     }
   },
 };

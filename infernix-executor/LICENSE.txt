@@ -1,0 +1,3 @@
+Copyright (c) 2026 Infernix Team. All rights reserved.
+
+This software is proprietary and confidential. Unauthorized copying, distribution, modification, or reverse engineering is strictly prohibited. By installing or using Infernix, you agree to the terms of this End User License Agreement (EULA).

@@ -14,12 +14,12 @@ module.exports = {
         .setDescription('Duration of the timeout')
         .setRequired(true)
         .addChoices(
-          { name: '60 seconds', value: '60' },
-          { name: '5 minutes', value: '300' },
-          { name: '10 minutes', value: '600' },
-          { name: '1 hour', value: '3600' },
-          { name: '1 day', value: '86400' },
-          { name: '1 week', value: '604800' },
+          { name: '60 seconds', value: '60'},
+          { name: '5 minutes', value: '300'},
+          { name: '10 minutes', value: '600'},
+          { name: '1 hour', value: '3600'},
+          { name: '1 day', value: '86400'},
+          { name: '1 week', value: '604800'},
         ))
     .addStringOption(option =>
       option.setName('reason')
@@ -34,15 +34,15 @@ module.exports = {
     const member = interaction.guild.members.cache.get(user.id);
 
     if (!member) {
-      return interaction.reply({ content: '❌ User not found in this server.', ephemeral: true });
+      return interaction.reply({ content: 'User not found in this server.', ephemeral: true });
     }
 
     if (!member.moderatable) {
-      return interaction.reply({ content: '❌ I cannot timeout this user. They may have higher permissions than me.', ephemeral: true });
+      return interaction.reply({ content: 'I cannot timeout this user. They may have higher permissions than me.', ephemeral: true });
     }
 
     if (member.id === interaction.user.id) {
-      return interaction.reply({ content: '❌ You cannot timeout yourself!', ephemeral: true });
+      return interaction.reply({ content: 'You cannot timeout yourself!', ephemeral: true });
     }
 
     const durationLabels = {
@@ -59,7 +59,7 @@ module.exports = {
 
       const embed = new EmbedBuilder()
         .setColor(0xFBBF24)
-        .setTitle('⏱️ Member Timed Out')
+        .setTitle('⏱ Member Timed Out')
         .addFields(
           { name: 'User', value: `${user.tag} (${user.id})`, inline: true },
           { name: 'Moderator', value: interaction.user.tag, inline: true },
@@ -76,7 +76,7 @@ module.exports = {
 
     } catch (error) {
       console.error('Timeout error:', error);
-      await interaction.reply({ content: '❌ Failed to timeout user.', ephemeral: true });
+      await interaction.reply({ content: 'Failed to timeout user.', ephemeral: true });
     }
   },
 };

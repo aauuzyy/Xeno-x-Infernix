@@ -448,3 +448,17 @@ input[type="color"]::-webkit-color-swatch-wrapper {
   border-radius: 4px;
   font-weight: 600;
 }
+
+/* Fire button style for Execution History */
+.folder-btn.fire {
+  background: linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 70%, #ff6b35) 100%);
+  border-color: var(--accent);
+  color: white;
+  font-weight: 600;
+}
+
+.folder-btn.fire:hover {
+  background: linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 50%, #ff6b35) 100%);
+  box-shadow: 0 4px 15px var(--accent-glow, rgba(249, 115, 22, 0.4));
+  transform: translateY(-1px);
+}

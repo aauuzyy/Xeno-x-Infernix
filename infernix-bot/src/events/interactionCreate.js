@@ -19,7 +19,7 @@ module.exports = {
         console.error(error);
         
         const errorMessage = {
-          content: '❌ There was an error while executing this command!',
+          content: 'There was an error while executing this command!',
           ephemeral: true,
         };
 

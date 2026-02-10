@@ -1,3 +1,4 @@
+// In production, use electron/preload.obf.cjs for proprietary builds
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
@@ -15,7 +16,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Executor functions
   attach: () => ipcRenderer.invoke('executor-attach'),
   unattach: (clientPid) => ipcRenderer.invoke('executor-unattach', clientPid),
-  execute: (script, clients) => ipcRenderer.invoke('executor-execute', { script, clients }),
+  execute: (script, clients, scriptName) => ipcRenderer.invoke('executor-execute', { script, clients, scriptName }),
   getClients: () => ipcRenderer.invoke('executor-get-clients'),
   killRoblox: () => ipcRenderer.invoke('executor-kill-roblox'),
   killProcess: (pid) => ipcRenderer.invoke('kill-process', pid),
@@ -42,6 +43,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getSavedScripts: () => ipcRenderer.invoke('get-saved-scripts'),
   loadScript: (filePath) => ipcRenderer.invoke('load-script', filePath),
   deleteScript: (filePath) => ipcRenderer.invoke('delete-script', filePath),
+
+    // Preset management
+    getPresets: () => ipcRenderer.invoke('get-presets'),
+    savePreset: (presetData) => ipcRenderer.invoke('save-preset', presetData),
+    loadPreset: (filePath) => ipcRenderer.invoke('load-preset', filePath),
+    deletePreset: (filePath) => ipcRenderer.invoke('delete-preset', filePath),
 
   // Settings persistence
   saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),
@@ -115,6 +122,25 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.removeAllListeners('update-error');
   },
   
+  // ==========================================
+  // V1.2.4 FEATURES - EXECUTION HISTORY
+  // ==========================================
+  
+  // Execution History
+  getExecutionHistory: () => ipcRenderer.invoke('get-execution-history'),
+  clearExecutionHistory: () => ipcRenderer.invoke('clear-execution-history'),
+  deleteHistoryItems: (ids) => ipcRenderer.invoke('delete-history-items', ids),
+
+  // ==========================================
+  // V1.2.5 FEATURES - VIRUSTOTAL INTEGRATION
+  // ==========================================
+
+  // VirusTotal Script Scanning
+  virusTotalScan: (script, scriptName) => ipcRenderer.invoke('virustotal-scan', { script, scriptName }),
+  virusTotalCheck: (analysisId) => ipcRenderer.invoke('virustotal-check', { analysisId }),
+  virusTotalCached: (script) => ipcRenderer.invoke('virustotal-cached', { script }),
+  virusTotalScanUrl: (url) => ipcRenderer.invoke('virustotal-scan-url', { url }),
+
   // App control
   quitApp: () => ipcRenderer.invoke('quit-app'),
 });

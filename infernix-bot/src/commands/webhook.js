@@ -36,7 +36,7 @@ module.exports = {
 
     // Validate webhook URL
     if (!url.startsWith('https://discord.com/api/webhooks/') && !url.startsWith('https://discordapp.com/api/webhooks/')) {
-      return interaction.reply({ content: '❌ Invalid webhook URL!', ephemeral: true });
+      return interaction.reply({ content: 'Invalid webhook URL!', ephemeral: true });
     }
 
     await interaction.deferReply({ ephemeral: true });
@@ -59,9 +59,9 @@ module.exports = {
     const success = await sendWebhook(url, options);
 
     if (success) {
-      await interaction.editReply({ content: '✅ Webhook message sent successfully!' });
+      await interaction.editReply({ content: 'Webhook message sent successfully!'});
     } else {
-      await interaction.editReply({ content: '❌ Failed to send webhook message. Check the URL.' });
+      await interaction.editReply({ content: 'Failed to send webhook message. Check the URL.'});
     }
   },
 };

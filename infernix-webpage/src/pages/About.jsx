@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { 
+import { useState, useEffect } from 'react';
   Flame, 
   Target, 
   Heart, 
@@ -52,6 +52,28 @@ const features = [
 ];
 
 export default function About() {
+  const [recentUsers, setRecentUsers] = useState([]);
+  const [totalUsers, setTotalUsers] = useState(0);
+
+  useEffect(() => {
+    // Fetch recent users from API
+    const fetchRecentUsers = async () => {
+      try {
+        const res = await fetch('/api/recent-users');
+        const data = await res.json();
+        setRecentUsers(data.users || []);
+        setTotalUsers(data.totalUsers || 0);
+      } catch (e) {
+        console.error('Failed to fetch recent users:', e);
+      }
+    };
+
+    fetchRecentUsers();
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchRecentUsers, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="relative bg-black min-h-screen pt-24 pb-20">
       {/* Fire background */}
@@ -160,6 +182,72 @@ export default function About() {
                 </div>
               </motion.div>
             ))}
+          </div>
+        </motion.div>
+
+        {/* Recent Users - Live Activity */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-16 p-8 rounded-2xl bg-white/5 border border-orange-500/10"
+        >
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-white mb-2">
+              100% Free & <span className="gradient-text">Keyless</span>
+            </h2>
+            <p className="text-gray-500">
+              No keys, no payments, no restrictions. Infernix is completely free
+              to use and trusted by <span className="text-white font-bold">{totalUsers.toLocaleString()}</span> users worldwide.
+            </p>
+          </div>
+
+          {/* Recent Users List */}
+          <div className="space-y-3 max-w-md mx-auto">
+            {recentUsers.length > 0 ? (
+              recentUsers.slice(0, 5).map((user, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="flex items-center justify-between p-4 rounded-xl bg-black/50 border border-white/5"
+                >
+                  <div className="flex items-center gap-3">
+                    {user.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt={user.username}
+                        className="w-10 h-10 rounded-full border-2 border-orange-500/30"
+                        onError={(e) => {
+                          e.target.src = `https://ui-avatars.com/api/?name=${user.username}&background=f97316&color=fff`;
+                        }}
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">
+                          {user.username?.charAt(0)?.toUpperCase() || '?'}
+                        </span>
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-white font-medium">
+                        {user.username?.length > 15 
+                          ? user.username.slice(0, 2) + '...' 
+                          : user.username} <span className="text-gray-500">used Infernix</span>
+                      </p>
+                      <p className="text-gray-600 text-xs">Active on Discord</p>
+                    </div>
+                  </div>
+                  <span className="text-orange-400 text-sm font-medium">{user.time || 'Recently'}</span>
+                </motion.div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-600">
+                <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                <p>Loading recent activity...</p>
+              </div>
+            )}
           </div>
         </motion.div>
 

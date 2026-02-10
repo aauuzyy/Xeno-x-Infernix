@@ -1,4 +1,4 @@
-import { Minus, Maximize2, X } from 'lucide-react';
+import { Minus, Maximize2, X, Flame } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import './TitleBar.css';
 
@@ -8,26 +8,11 @@ function TitleBar() {
   const handleMaximize = () => window.electronAPI?.maximizeWindow();
   const handleClose = () => window.electronAPI?.closeWindow();
 
-  // Derive darker and lighter shades from accent color
-  const accentDark = accentColor;
-  const accentLight = '#fbbf24';  // Keep ember/yellow for gradient ends
-
   return (
     <header className="titlebar">
       <div className="titlebar-left">
         <div className="logo">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <defs>
-              <linearGradient id="fireGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor={accentLight}/>
-                <stop offset="50%" stopColor={accentColor}/>
-                <stop offset="100%" stopColor="#ef4444"/>
-              </linearGradient>
-            </defs>
-            <path d="M12 2C12 2 8 6 8 10C8 12 9 14 12 14C15 14 16 12 16 10C16 6 12 2 12 2Z" fill="url(#fireGrad)"/>
-            <path d="M12 8C12 8 10 10 10 12C10 13 10.5 14 12 14C13.5 14 14 13 14 12C14 10 12 8 12 8Z" fill="#fcd34d"/>
-            <path d="M8 14C6 16 6 18 8 20C10 22 14 22 16 20C18 18 18 16 16 14" stroke="url(#fireGrad)" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
-          </svg>
+          <Flame size={20} style={{ color: accentColor }} />
           <span className="logo-name">Infernix</span>
         </div>
       </div>

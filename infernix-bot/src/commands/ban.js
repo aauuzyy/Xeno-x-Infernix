@@ -29,11 +29,11 @@ module.exports = {
 
     if (member) {
       if (!member.bannable) {
-        return interaction.reply({ content: '❌ I cannot ban this user. They may have higher permissions than me.', ephemeral: true });
+        return interaction.reply({ content: 'I cannot ban this user. They may have higher permissions than me.', ephemeral: true });
       }
 
       if (member.id === interaction.user.id) {
-        return interaction.reply({ content: '❌ You cannot ban yourself!', ephemeral: true });
+        return interaction.reply({ content: 'You cannot ban yourself!', ephemeral: true });
       }
     }
 
@@ -42,7 +42,7 @@ module.exports = {
       try {
         const dmEmbed = new EmbedBuilder()
           .setColor(0xDC2626)
-          .setTitle('🔨 You have been banned')
+          .setTitle('You have been banned')
           .setDescription(`You have been banned from **${interaction.guild.name}**`)
           .addFields({ name: 'Reason', value: reason })
           .setTimestamp();
@@ -58,7 +58,7 @@ module.exports = {
 
       const embed = new EmbedBuilder()
         .setColor(0xDC2626)
-        .setTitle('🔨 Member Banned')
+        .setTitle('Member Banned')
         .addFields(
           { name: 'User', value: `${user.tag} (${user.id})`, inline: true },
           { name: 'Moderator', value: interaction.user.tag, inline: true },
@@ -75,7 +75,7 @@ module.exports = {
 
     } catch (error) {
       console.error('Ban error:', error);
-      await interaction.reply({ content: '❌ Failed to ban user.', ephemeral: true });
+      await interaction.reply({ content: 'Failed to ban user.', ephemeral: true });
     }
   },
 };

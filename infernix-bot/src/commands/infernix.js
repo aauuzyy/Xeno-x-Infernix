@@ -8,10 +8,10 @@ module.exports = {
   async execute(interaction) {
     const embed = new EmbedBuilder()
       .setColor(0xF97316)
-      .setTitle('🔥 Infernix Executor')
+      .setTitle('Infernix Executor')
       .setDescription('The next-generation Roblox executor with a blazing fast UI and powerful features.')
       .addFields(
-        { name: '⚡ Features', value: [
+        { name: 'Features', value: [
           '• Modern React + Electron UI',
           '• Script Hub with 1000+ scripts',
           '• AutoExec on game join',
@@ -19,12 +19,12 @@ module.exports = {
           '• Drag & Drop script loading',
           '• Auto-Update system',
         ].join('\n'), inline: false },
-        { name: '🔧 Powered By', value: 'Xeno API', inline: true },
-        { name: '💻 Platform', value: 'Windows x64', inline: true },
-        { name: '📦 Latest Version', value: 'v1.1.8', inline: true },
+        { name: 'Powered By', value: 'Xeno API', inline: true },
+        { name: 'Platform', value: 'Windows x64', inline: true },
+        { name: 'Latest Version', value: 'v1.1.8', inline: true },
       )
       .setThumbnail(interaction.client.user.displayAvatarURL())
-      .setFooter({ text: 'Infernix Team' })
+      .setFooter({ text: 'Infernix Team'})
       .setTimestamp();
 
     const row = new ActionRowBuilder()
@@ -33,12 +33,12 @@ module.exports = {
           .setLabel('Download')
           .setStyle(ButtonStyle.Link)
           .setURL('https://github.com/aauuzyy/Xeno-x-Infernix/releases/latest')
-          .setEmoji('📥'),
+          .setEmoji(''),
         new ButtonBuilder()
           .setLabel('GitHub')
           .setStyle(ButtonStyle.Link)
           .setURL('https://github.com/aauuzyy/Xeno-x-Infernix')
-          .setEmoji('🔗'),
+          .setEmoji(''),
       );
 
     await interaction.reply({ embeds: [embed], components: [row] });

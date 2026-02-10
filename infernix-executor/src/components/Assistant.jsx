@@ -58,7 +58,7 @@ function Assistant({ tabs, onWriteToTab, onSwitchToExecutor, onNotify }) {
       let delay = 3;
       
       if (char === '\n') delay = 15;
-      else if (char === ' ') delay = 5;
+      else if (char === '') delay = 5;
       else if ('.,;:(){}[]'.includes(char)) delay = 8;
       
       await new Promise(r => setTimeout(r, delay));
@@ -87,7 +87,7 @@ function Assistant({ tabs, onWriteToTab, onSwitchToExecutor, onNotify }) {
 
     setIsGenerating(true);
     setError(null);
-    setStatus('🔥 Connecting to Infernix AI...');
+    setStatus('Connecting to Infernix AI...');
 
     try {
       const targetTab = findTargetTab(prompt);
@@ -95,7 +95,7 @@ function Assistant({ tabs, onWriteToTab, onSwitchToExecutor, onNotify }) {
       const writeTabName = targetTab?.name || tabs[tabs.length - 1]?.name || 'Script';
 
       // Generate code with AI
-      setStatus('🧠 AI is thinking...');
+      setStatus('AI is thinking...');
       const generatedCode = await generateWithAI(prompt);
 
       if (!generatedCode) {
@@ -103,7 +103,7 @@ function Assistant({ tabs, onWriteToTab, onSwitchToExecutor, onNotify }) {
       }
 
       // Switch to executor view
-      setStatus('📝 Switching to ' + writeTabName + '...');
+      setStatus('Switching to '+ writeTabName + '...');
       onSwitchToExecutor(writeTabId);
       await new Promise(r => setTimeout(r, 400));
 
@@ -112,7 +112,7 @@ function Assistant({ tabs, onWriteToTab, onSwitchToExecutor, onNotify }) {
       await new Promise(r => setTimeout(r, 100));
 
       // Type the code with animation
-      setStatus('✍️ Writing code...');
+      setStatus('Writing code...');
       await typeCode(generatedCode, writeTabId);
 
       setStatus('Ready to assist');
@@ -121,7 +121,7 @@ function Assistant({ tabs, onWriteToTab, onSwitchToExecutor, onNotify }) {
       // Show notification
       onNotify({
         type: 'ai',
-        title: '✨ Script Generated',
+        title: 'Script Generated',
         message: `AI script written to ${writeTabName}`,
         duration: 5000
       });
@@ -142,7 +142,7 @@ function Assistant({ tabs, onWriteToTab, onSwitchToExecutor, onNotify }) {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter'&& !e.shiftKey) {
       e.preventDefault();
       handleGenerate();
     }
@@ -176,12 +176,12 @@ function Assistant({ tabs, onWriteToTab, onSwitchToExecutor, onNotify }) {
           <span className="tip-tag" onClick={() => setPrompt('auto farm script')}>Auto Farm</span>
         </div>
         <p className="tip-hint">
-          💡 Click a tag or type anything! Mention a tab name to write there.
+           Click a tag or type anything! Mention a tab name to write there.
         </p>
       </div>
 
       <div className="assistant-status">
-        <div className={`status-indicator ${isGenerating ? 'active' : ''} ${error ? 'error' : ''}`} />
+        <div className={`status-indicator ${isGenerating ? 'active': ''} ${error ? 'error': ''}`} />
         <span>{status}</span>
         {isGenerating && <Loader size={14} className="spinning" />}
       </div>

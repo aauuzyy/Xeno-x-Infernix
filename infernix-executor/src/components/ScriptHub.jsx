@@ -106,10 +106,10 @@ function ScriptHub({ onLoadScript, onExecuteScript, clients = [] }) {
     setLoading(true);
     const currentPage = resetPage ? 1 : page;
     try {
-      const query = { page: currentPage, max: 20, sortBy, order: 'desc' };
+      const query = { page: currentPage, max: 20, sortBy, order: 'desc'};
       if (placeId && gameFilterEnabled) query.placeId = placeId;
       if (filters.mode) query.mode = filters.mode;
-      if (filters.key !== null) query.key = filters.key ? '1' : '0';
+      if (filters.key !== null) query.key = filters.key ? '1': '0';
       let data = window.electronAPI?.scriptbloxFetch 
         ? await window.electronAPI.scriptbloxFetch('script/fetch', query)
         : await (await fetch(`https://scriptblox.com/api/script/fetch?${new URLSearchParams(query)}`)).json();
@@ -117,7 +117,7 @@ function ScriptHub({ onLoadScript, onExecuteScript, clients = [] }) {
       setTotalPages(data.result?.totalPages || 1);
       if (placeId && gameFilterEnabled && gameScripts.length < 20) {
         const universalData = window.electronAPI?.scriptbloxFetch
-          ? await window.electronAPI.scriptbloxFetch('script/fetch', { page: 1, max: 10, sortBy: 'views', order: 'desc', universal: '1' })
+          ? await window.electronAPI.scriptbloxFetch('script/fetch', { page: 1, max: 10, sortBy: 'views', order: 'desc', universal: '1'})
           : await (await fetch(`https://scriptblox.com/api/script/fetch?page=1&max=10&sortBy=views&order=desc&universal=1`)).json();
         if (universalData.result?.scripts) gameScripts = [...gameScripts, ...universalData.result.scripts.map(s => ({...s, _isUniversal: true}))];
       }
@@ -131,7 +131,7 @@ function ScriptHub({ onLoadScript, onExecuteScript, clients = [] }) {
   const fetchFeaturedScripts = async () => {
     setLoading(true);
     try {
-      const query = { page: 1, max: 20, sortBy: 'views', order: 'desc' };
+      const query = { page: 1, max: 20, sortBy: 'views', order: 'desc'};
       const data = window.electronAPI?.scriptbloxFetch
         ? await window.electronAPI.scriptbloxFetch('script/fetch', query)
         : await (await fetch(`https://scriptblox.com/api/script/fetch?${new URLSearchParams(query)}`)).json();
@@ -145,10 +145,10 @@ function ScriptHub({ onLoadScript, onExecuteScript, clients = [] }) {
     setIsSearchMode(true); setLoading(true);
     try {
       const currentPage = reset ? 1 : page;
-      const query = { q: search.trim(), page: currentPage, max: 20, sortBy, order: 'desc', strict: 'true' };
+      const query = { q: search.trim(), page: currentPage, max: 20, sortBy, order: 'desc', strict: 'true'};
       if (filters.mode) query.mode = filters.mode;
-      if (filters.key !== null) query.key = filters.key ? '1' : '0';
-      if (filters.universal !== null) query.universal = filters.universal ? '1' : '0';
+      if (filters.key !== null) query.key = filters.key ? '1': '0';
+      if (filters.universal !== null) query.universal = filters.universal ? '1': '0';
       if (detectedGame && gameFilterEnabled) query.placeId = detectedGame.placeId;
       const data = window.electronAPI?.scriptbloxFetch ? await window.electronAPI.scriptbloxFetch('script/search', query) : await (await fetch(`https://scriptblox.com/api/script/search?${new URLSearchParams(query)}`)).json();
       if (data.result?.scripts) { if (reset) { setScripts(data.result.scripts); setPage(1); setScrollTop(0); } else { setScripts(prev => [...prev, ...data.result.scripts]); } setTotalPages(data.result.totalPages || 1); setHasMore(currentPage < (data.result.totalPages || 1)); }
@@ -213,36 +213,36 @@ function ScriptHub({ onLoadScript, onExecuteScript, clients = [] }) {
     const nextPage = page + 1; setPage(nextPage);
     if (isSearchMode) fetchScripts(false);
     else if (detectedGame && gameFilterEnabled) fetchScriptsForGame(detectedGame.placeId, false);
-    else { setLoading(true); window.electronAPI?.scriptbloxFetch?.('script/fetch', { page: nextPage, max: 20, sortBy: 'views', order: 'desc' }).then(data => { if (data.result?.scripts) { setScripts(prev => [...prev, ...data.result.scripts]); setHasMore(nextPage < (data.result.totalPages || 1)); } setLoading(false); }).catch(() => setLoading(false)); }
+    else { setLoading(true); window.electronAPI?.scriptbloxFetch?.('script/fetch', { page: nextPage, max: 20, sortBy: 'views', order: 'desc'}).then(data => { if (data.result?.scripts) { setScripts(prev => [...prev, ...data.result.scripts]); setHasMore(nextPage < (data.result.totalPages || 1)); } setLoading(false); }).catch(() => setLoading(false)); }
   };
 
   const formatNumber = (num) => { if (!num) return '0'; if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M'; if (num >= 1000) return (num / 1000).toFixed(1) + 'K'; return num.toString(); };
-  const formatDate = (dateStr) => dateStr ? new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
-  const getImageUrl = (script) => script.game?.imageUrl ? (script.game.imageUrl.startsWith('http') ? script.game.imageUrl : `https://scriptblox.com${script.game.imageUrl.startsWith('/') ? '' : '/'}${script.game.imageUrl}`) : null;
+  const formatDate = (dateStr) => dateStr ? new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'}) : '';
+  const getImageUrl = (script) => script.game?.imageUrl ? (script.game.imageUrl.startsWith('http') ? script.game.imageUrl : `https://scriptblox.com${script.game.imageUrl.startsWith('/') ? '': '/'}${script.game.imageUrl}`) : null;
   const toggleGameFilter = () => { setGameFilterEnabled(!gameFilterEnabled); if (!gameFilterEnabled && detectedGame) fetchScriptsForGame(detectedGame.placeId, true); else fetchFeaturedScripts(); };
 
   return (
     <div className="scripthub">
       <div className="scripthub-header">
         {detectedGame && (
-          <div className={`game-detection-banner ${gameFilterEnabled ? 'active' : 'inactive'}`}>
+          <div className={`game-detection-banner ${gameFilterEnabled ? 'active': 'inactive'}`}>
             <div className="game-info">{detectedGame.thumbnail && <img src={detectedGame.thumbnail} alt="" className="game-thumb" />}<div className="game-details"><div className="game-status"><Zap size={12} /><span>Playing</span></div><h3 className="game-name">{detectedGame.name}</h3><span className="game-creator">by {detectedGame.creator}</span></div></div>
-            <div className="game-filter-toggle"><button className={`filter-toggle-btn ${gameFilterEnabled ? 'enabled' : ''}`} onClick={toggleGameFilter}>{gameFilterEnabled ? <><Gamepad2 size={14} /><span>Game Filter ON</span></> : <><Globe size={14} /><span>Show All</span></>}</button></div>
+            <div className="game-filter-toggle"><button className={`filter-toggle-btn ${gameFilterEnabled ? 'enabled': ''}`} onClick={toggleGameFilter}>{gameFilterEnabled ? <><Gamepad2 size={14} /><span>Game Filter ON</span></> : <><Globe size={14} /><span>Show All</span></>}</button></div>
           </div>
         )}
         <div className="search-row">
-          <div className="search-box"><Search size={14} /><input type="text" placeholder={detectedGame && gameFilterEnabled ? `Search scripts for ${detectedGame.name}...` : "Search scripts..."} value={search} onChange={(e) => setSearch(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && fetchScripts(true)} /></div>
+          <div className="search-box"><Search size={14} /><input type="text" placeholder={detectedGame && gameFilterEnabled ? `Search scripts for ${detectedGame.name}...` : "Search scripts..."} value={search} onChange={(e) => setSearch(e.target.value)} onKeyPress={(e) => e.key === 'Enter'&& fetchScripts(true)} /></div>
           <div className="header-actions">
-            <button className={`filter-btn ${showFilters ? 'active' : ''}`} onClick={() => setShowFilters(!showFilters)}><Filter size={14} />Filters<ChevronDown size={12} className={showFilters ? 'rotated' : ''} /></button>
-            <button className="refresh-btn" onClick={() => { if (detectedGame && gameFilterEnabled) fetchScriptsForGame(detectedGame.placeId, true); else if (search) fetchScripts(true); else fetchFeaturedScripts(); }}><RefreshCw size={14} className={loading ? 'spinning' : ''} /></button>
+            <button className={`filter-btn ${showFilters ? 'active': ''}`} onClick={() => setShowFilters(!showFilters)}><Filter size={14} />Filters<ChevronDown size={12} className={showFilters ? 'rotated': ''} /></button>
+            <button className="refresh-btn" onClick={() => { if (detectedGame && gameFilterEnabled) fetchScriptsForGame(detectedGame.placeId, true); else if (search) fetchScripts(true); else fetchFeaturedScripts(); }}><RefreshCw size={14} className={loading ? 'spinning': ''} /></button>
           </div>
         </div>
         {showFilters && (
           <div className="filters-panel">
             <div className="filter-group"><label>Sort by</label><select value={sortBy} onChange={(e) => setSortBy(e.target.value)}><option value="views">Most Views</option><option value="likeCount">Most Likes</option><option value="updatedAt">Recently Updated</option><option value="createdAt">Newest</option></select></div>
             <div className="filter-group"><label>Type</label><select value={filters.mode} onChange={(e) => setFilters({ ...filters, mode: e.target.value })}><option value="">All</option><option value="free">Free</option><option value="paid">Paid</option></select></div>
-            <div className="filter-group"><label>Key Required</label><select value={filters.key === null ? '' : filters.key ? '1' : '0'} onChange={(e) => setFilters({ ...filters, key: e.target.value === '' ? null : e.target.value === '1' })}><option value="">Any</option><option value="0">No Key</option><option value="1">Key Required</option></select></div>
-            <div className="filter-group"><label>Universal</label><select value={filters.universal === null ? '' : filters.universal ? '1' : '0'} onChange={(e) => setFilters({ ...filters, universal: e.target.value === '' ? null : e.target.value === '1' })}><option value="">Any</option><option value="1">Universal Only</option><option value="0">Game Specific</option></select></div>
+            <div className="filter-group"><label>Key Required</label><select value={filters.key === null ? '': filters.key ? '1': '0'} onChange={(e) => setFilters({ ...filters, key: e.target.value === ''? null : e.target.value === '1'})}><option value="">Any</option><option value="0">No Key</option><option value="1">Key Required</option></select></div>
+            <div className="filter-group"><label>Universal</label><select value={filters.universal === null ? '': filters.universal ? '1': '0'} onChange={(e) => setFilters({ ...filters, universal: e.target.value === ''? null : e.target.value === '1'})}><option value="">Any</option><option value="1">Universal Only</option><option value="0">Game Specific</option></select></div>
           </div>
         )}
         {!search && !loading && scripts.length > 0 && (
@@ -255,11 +255,11 @@ function ScriptHub({ onLoadScript, onExecuteScript, clients = [] }) {
         {!loading && scripts.length === 0 && <div className="empty-state"><Search size={32} /><p>No scripts found</p><span>{detectedGame && gameFilterEnabled ? `No scripts found for ${detectedGame.name}. Try disabling game filter.` : 'Try a different search term'}</span></div>}
         
         {scripts.length > 0 && (
-          <div style={{ height: totalHeight, position: 'relative' }}>
+          <div style={{ height: totalHeight, position: 'relative'}}>
             <div style={{ transform: `translateY(${topPadding}px)` }}>
               <div className="scripts-grid">
                 {visibleScripts.map((script, idx) => (
-                  <div key={script._id || (startIndex + idx)} className={`script-card fade-in ${script._isUniversal ? 'universal-highlight' : ''}`}>
+                  <div key={script._id || (startIndex + idx)} className={`script-card fade-in ${script._isUniversal ? 'universal-highlight': ''}`}>
                     <div className="script-thumbnail">
                       {getImageUrl(script) ? <img src={getImageUrl(script)} alt="" loading="lazy" /> : <div className="thumb-placeholder"><Flame size={28} /></div>}
                       <div className="thumbnail-overlay">
@@ -282,7 +282,7 @@ function ScriptHub({ onLoadScript, onExecuteScript, clients = [] }) {
                         <span className="stat date" title="Updated">{formatDate(script.updatedAt || script.createdAt)}</span>
                       </div>
                       <div className="script-actions">
-                        <button className={`action-btn copy-btn ${copiedId === script._id ? 'copied' : ''}`} onClick={() => handleCopyScript(script)} title="Copy Script">
+                        <button className={`action-btn copy-btn ${copiedId === script._id ? 'copied': ''}`} onClick={() => handleCopyScript(script)} title="Copy Script">
                           <Copy size={12} />
                         </button>
                         <button className="action-btn open-btn" onClick={() => handleLoadScript(script)} title="Open in Tab">

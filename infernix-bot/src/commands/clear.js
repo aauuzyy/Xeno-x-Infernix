@@ -37,7 +37,7 @@ module.exports = {
 
       const embed = new EmbedBuilder()
         .setColor(0x22C55E)
-        .setTitle('🗑️ Messages Cleared')
+        .setTitle('Messages Cleared')
         .setDescription(`Successfully deleted **${deleted.size}** message(s)${user ? ` from ${user.tag}` : ''}.`)
         .setFooter({ text: `Cleared by ${interaction.user.tag}` })
         .setTimestamp();
@@ -46,7 +46,7 @@ module.exports = {
 
     } catch (error) {
       console.error('Clear error:', error);
-      await interaction.editReply({ content: '❌ Failed to delete messages. Make sure they\'re not older than 14 days.' });
+      await interaction.editReply({ content: 'Failed to delete messages. Make sure they\'re not older than 14 days.'});
     }
   },
 };

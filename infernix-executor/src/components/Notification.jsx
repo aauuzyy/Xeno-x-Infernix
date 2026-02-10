@@ -40,7 +40,7 @@ function NotificationItem({ notification, onRemove }) {
   };
 
   return (
-    <div className={`notification ${notification.type} ${isExiting ? 'exiting' : ''}`}>
+    <div className={`notification ${notification.type} ${isExiting ? 'exiting': ''}`}>
       <div className="notification-icon">{getIcon()}</div>
       <div className="notification-content">
         <div className="notification-title">{notification.title}</div>

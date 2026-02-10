@@ -111,7 +111,7 @@ function AutoExecManager({ tabs, onClose }) {
                 (tabs || []).map(tab => (
                   <div
                     key={tab.id}
-                    className={`tab-item ${selectedTabs.includes(tab.id) ? 'selected' : ''}`}
+                    className={`tab-item ${selectedTabs.includes(tab.id) ? 'selected': ''}`}
                     onClick={() => toggleTabSelection(tab.id)}
                   >
                     <div className="tab-checkbox">
@@ -134,7 +134,7 @@ function AutoExecManager({ tabs, onClose }) {
               disabled={selectedTabs.length === 0 || loading}
             >
               <Plus size={16} />
-              {loading ? 'Adding...' : `Add to AutoExec ${selectedTabs.length > 0 ? `(${selectedTabs.length})` : ''}`}
+              {loading ? 'Adding...': `Add to AutoExec ${selectedTabs.length > 0 ? `(${selectedTabs.length})` : ''}`}
             </button>
           </div>
 

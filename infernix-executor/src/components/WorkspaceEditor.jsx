@@ -23,7 +23,7 @@ function WorkspaceEditor({ onDone, onClose }) {
   const [code, setCode] = useState('-- Start creating your script here!\n-- Use the tools on the left to add code snippets\n\n');
   const [scriptName, setScriptName] = useState('New Script');
   const [aiMessages, setAiMessages] = useState([
-    { role: 'assistant', content: 'Hi! I\'m here to help edit your script. Tell me what you want to change or add, and I\'ll help you modify specific parts.' }
+    { role: 'assistant', content: 'Hi! I\'m here to help edit your script. Tell me what you want to change or add, and I\'ll help you modify specific parts.'}
   ]);
   const [aiInput, setAiInput] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
@@ -34,7 +34,7 @@ function WorkspaceEditor({ onDone, onClose }) {
 
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth'});
     }
   }, [aiMessages]);
 
@@ -52,7 +52,7 @@ function WorkspaceEditor({ onDone, onClose }) {
         endLineNumber: position.lineNumber,
         endColumn: position.column,
       };
-      editor.executeEdits('', [{ range, text: snippet + '\n\n' }]);
+      editor.executeEdits('', [{ range, text: snippet + '\n\n'}]);
       editor.focus();
     }
   };
@@ -156,10 +156,10 @@ INSTRUCTIONS:
             />
           </div>
           <div className="workspace-actions">
-            <button className="toggle-panel-btn" onClick={() => setShowTools(!showTools)} title={showTools ? 'Hide Tools' : 'Show Tools'}>
+            <button className="toggle-panel-btn" onClick={() => setShowTools(!showTools)} title={showTools ? 'Hide Tools': 'Show Tools'}>
               <PanelLeftClose size={16} />
             </button>
-            <button className="toggle-panel-btn" onClick={() => setShowAI(!showAI)} title={showAI ? 'Hide AI' : 'Show AI'}>
+            <button className="toggle-panel-btn" onClick={() => setShowAI(!showAI)} title={showAI ? 'Hide AI': 'Show AI'}>
               <PanelRightClose size={16} />
             </button>
             <button className="done-btn" onClick={handleDone}>
@@ -173,7 +173,7 @@ INSTRUCTIONS:
         </div>
 
         <div className="workspace-body">
-          <div className={`tools-panel ${showTools ? '' : 'collapsed'}`}>
+          <div className={`tools-panel ${showTools ? '': 'collapsed'}`}>
             {showTools ? (
               <>
                 <h3><Code size={14} /> Script Tools</h3>
@@ -223,7 +223,7 @@ INSTRUCTIONS:
             />
           </div>
 
-          <div className={`ai-panel ${showAI ? '' : 'collapsed'}`}>
+          <div className={`ai-panel ${showAI ? '': 'collapsed'}`}>
             {showAI ? (
               <>
                 <div className="ai-header">
@@ -236,7 +236,7 @@ INSTRUCTIONS:
                     {aiMessages.map((msg, i) => (
                       <div key={i} className={`ai-message ${msg.role}`}>
                         <div className="ai-avatar">
-                          {msg.role === 'assistant' ? <Flame size={14} /> : <User size={14} />}
+                          {msg.role === 'assistant'? <Flame size={14} /> : <User size={14} />}
                         </div>
                         <div className="message-bubble">
                           {formatMessage(msg.content)}
@@ -262,7 +262,7 @@ INSTRUCTIONS:
                     type="text"
                     value={aiInput}
                     onChange={(e) => setAiInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleAISend()}
+                    onKeyDown={(e) => e.key === 'Enter'&& handleAISend()}
                     placeholder="Ask to edit your script..."
                     disabled={aiLoading}
                   />

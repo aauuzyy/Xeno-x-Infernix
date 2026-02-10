@@ -15,7 +15,7 @@ export default function handler(req, res) {
 
   if (req.method === 'POST') {
     // Executor sends user data here
-    const { username, odometer,  version, discordId } = req.body;
+    const { username, version, discordId, avatar } = req.body;
 
     if (!username) {
       return res.status(400).json({ error: 'Missing username' });
@@ -24,8 +24,8 @@ export default function handler(req, res) {
     // Add to recent users
     const newUser = {
       username,
-      avatar: discordId ? `https://cdn.discordapp.com/avatars/${discordId}/${avatar}.png` : null,
-      version: version || '1.1.8',
+      avatar: discordId && avatar ? `https://cdn.discordapp.com/avatars/${discordId}/${avatar}.png` : null,
+      version: version || '1.2.4',
       time: 'Just now',
       timestamp: Date.now(),
     };

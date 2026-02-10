@@ -85,7 +85,7 @@ function OpenScriptModal({ isOpen, onClose, onOpen }) {
     if (e.key === 'Escape') {
       onClose();
     }
-    if (e.key === 'Enter' && selectedScript) {
+    if (e.key === 'Enter'&& selectedScript) {
       handleOpen(selectedScript);
     }
   };
@@ -115,7 +115,7 @@ function OpenScriptModal({ isOpen, onClose, onOpen }) {
             />
           </div>
           <button className="toolbar-btn" onClick={loadScripts} title="Refresh">
-            <RefreshCw size={14} className={loading ? 'spinning' : ''} />
+            <RefreshCw size={14} className={loading ? 'spinning': ''} />
           </button>
         </div>
 
@@ -128,14 +128,14 @@ function OpenScriptModal({ isOpen, onClose, onOpen }) {
           ) : filteredScripts.length === 0 ? (
             <div className="scripts-empty">
               <FileText size={40} />
-              <h3>{searchQuery ? 'No matching scripts' : 'No saved scripts'}</h3>
-              <p>{searchQuery ? 'Try a different search term' : 'Save a script to see it here'}</p>
+              <h3>{searchQuery ? 'No matching scripts': 'No saved scripts'}</h3>
+              <p>{searchQuery ? 'Try a different search term': 'Save a script to see it here'}</p>
             </div>
           ) : (
             filteredScripts.map(script => (
               <div 
                 key={script.path}
-                className={`script-item ${selectedScript?.path === script.path ? 'selected' : ''}`}
+                className={`script-item ${selectedScript?.path === script.path ? 'selected': ''}`}
                 onClick={() => setSelectedScript(script)}
                 onDoubleClick={() => handleOpen(script)}
               >
