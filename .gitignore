@@ -1,3 +1,16 @@
+# Ignore everything in the repository
+/*
+
+# But keep this .gitignore and the README so the repo remains visible
+!.gitignore
+!README.md
+
+# Optionally allow the LICENSE or other small public files (uncomment if desired)
+#!LICENSE
+#!build/license.txt
+
+# Keep .git directory intact (Git tracks it automatically)
+.git/
 # Exclude copyrighted Xeno files and extracted content
 xeno-v1.3.15-extracted/
 xeno-v1.3.15-source/
