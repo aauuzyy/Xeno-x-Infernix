@@ -1,14 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
-  Flame, 
-  Target, 
-  Heart, 
-  Shield, 
-  Zap, 
-  Users,
-  Code2,
-  Globe
-} from 'lucide-react';
+import { Flame, Target, Heart, Shield, Zap, Users, Code2, Globe } from 'lucide-react';
 
 const values = [
   {
