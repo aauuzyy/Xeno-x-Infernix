@@ -25,17 +25,38 @@ function App() {
 
   // Listen for client updates from main process
   useEffect(() => {
+    // Add smoothing to avoid flicker when main briefly reports empty
+    const lastNonEmptyRef = { clients: [], at: 0 };
+
+    const updateClients = (incoming) => {
+      const list = incoming || [];
+      const now = Date.now();
+      if (Array.isArray(list) && list.length > 0) {
+        lastNonEmptyRef.clients = list;
+        lastNonEmptyRef.at = now;
+        setClients(list);
+        return;
+      }
+
+      // If we recently had clients, keep showing them for a short grace period
+      if (now - lastNonEmptyRef.at < 1500 && Array.isArray(lastNonEmptyRef.clients) && lastNonEmptyRef.clients.length > 0) {
+        setClients(lastNonEmptyRef.clients);
+      } else {
+        setClients([]);
+      }
+    };
+
     if (window.electronAPI?.onClientsUpdate) {
       window.electronAPI.onClientsUpdate((newClients) => {
-        setClients(newClients || []);
+        updateClients(newClients);
       });
-      
+
       // Get initial version
       window.electronAPI.getVersion?.().then((ver) => {
         setExecutorVersion(ver || '1.0.0');
       });
     }
-    
+
     return () => {
       window.electronAPI?.removeClientsListener?.();
     };
