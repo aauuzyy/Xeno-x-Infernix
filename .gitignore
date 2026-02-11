@@ -5,6 +5,10 @@
 !.gitignore
 !README.md
 
+## Allow the website folder for Vercel deployments
+!infernix-webpage/
+!infernix-webpage/**
+
 # Optionally allow the LICENSE or other small public files (uncomment if desired)
 #!LICENSE
 #!build/license.txt
