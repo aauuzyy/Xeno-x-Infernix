@@ -12,68 +12,82 @@ A modern, feature-rich Roblox script executor built with Electron, React, and na
 - **AI Assistant**: Integrated AI help system
 - **Settings Manager**: Customizable configuration
 
-## 🛠️ Tech Stack
+# Infernix Executor
 
-- **Frontend**: React 19, Vite, Framer Motion
-- **Desktop**: Electron 40
-- **Editor**: Monaco Editor (VS Code's editor)
-- **Native**: Node.js N-API C++ addon
-- **Icons**: Lucide React
+Infernix Executor is a desktop application for managing and executing scripts in Roblox environments. It combines an Electron-based shell with a React user interface and native C++ components for performance-critical operations.
 
-## 📦 Project Structure
+## Features
+
+- Modern, responsive user interface built with React and Framer Motion
+- Integrated Monaco editor with syntax highlighting and editing features
+- Native C++ addon for reliable script execution
+- Support for managing multiple client instances
+- Built-in script library (Script Hub)
+- Configurable settings and preferences
+
+## Technology Stack
+
+- Frontend: React 19, Vite
+- Desktop: Electron 40
+- Editor: Monaco Editor
+- Native Integration: Node.js N-API C++ addon
+- Icons: Lucide React
+
+## Project Structure
 
 ```
 infernix-executor/
-├── electron/          # Electron main and preload scripts
-├── src/              # React frontend source
-│   ├── components/   # UI components
-│   └── assets/       # Static assets
-├── native/           # Native C++ addon
+├── electron/              # Electron main and preload scripts
+├── src/                   # React frontend source
+│   ├── components/        # UI components
+│   └── assets/            # Static assets
+├── native/                # Native C++ addon
 │   └── infernix-addon/
-│       └── src/      # C++ source code
-└── public/           # Public assets
+│       └── src/           # C++ source code
+└── public/                # Public assets
 ```
 
-## 🔧 Development
+## Development
 
 ### Prerequisites
 
-- Node.js 18+ 
-- npm or yarn
-- Python 3.x (for native addon compilation)
-- Visual Studio Build Tools (Windows)
+- Node.js 18 or later
+- npm (or an alternative package manager)
+- Python 3.x (required for building native addons)
+- Visual Studio Build Tools (Windows) for native compilation
 
-### Setup
+### Setup and Run
 
-1. Clone the repository:
+1. Clone the repository and change directory:
+
 ```bash
 git clone <your-repo-url>
 cd infernix-executor
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
-3. Run in development mode:
+3. Run in development mode (starts Vite and Electron):
+
 ```bash
 npm run electron:dev
 ```
 
-This will start the Vite dev server and launch Electron.
+### Common Scripts
 
-### Available Scripts
+- `npm run dev` — Start Vite development server
+- `npm run build` — Build renderer for production
+- `npm run electron` — Launch Electron against built files
+- `npm run electron:dev` — Start Vite and launch Electron for development
+- `npm run lint` — Run linting checks
 
-- `npm run dev` - Start Vite dev server
-- `npm run build` - Build for production
-- `npm run electron` - Run Electron
-- `npm run electron:dev` - Run in development mode
-- `npm run lint` - Lint code
+## Building the Native Addon
 
-## 🏗️ Building
-
-To build the native addon:
+To build the native addon component:
 
 ```bash
 cd native/infernix-addon
@@ -81,24 +95,20 @@ npm install
 npm run build
 ```
 
-## 📝 Components
+## Components Overview
 
-- **Dashboard**: Main overview and quick actions
-- **EditorView**: Monaco-based script editor
-- **ClientManager**: Manage connected Roblox instances
-- **ScriptHub**: Browse and load pre-made scripts
-- **Assistant**: AI-powered help and suggestions
-- **SettingsView**: Application configuration
-- **TitleBar**: Custom window controls
+- `Dashboard` — Application overview and quick actions
+- `EditorView` — Monaco-based script editor
+- `ClientManager` — Manage connected Roblox instances
+- `ScriptHub` — Browse and load scripts
+- `Assistant` — Assistance and suggestions
+- `SettingsView` — Application settings and preferences
+- `TitleBar` — Custom window controls
 
-## ⚠️ Disclaimer
+## License and Legal
 
-This project is for educational purposes only. Use responsibly and at your own risk.
+This repository includes licensing and usage terms. Review the `LICENSE.txt` and `EULA.txt` files for details. Use this software in accordance with all applicable laws and platform terms of service.
 
-## 📄 License
+## Contributing
 
-See LICENSE file for details.
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome. Please open an issue or submit a pull request describing the proposed change.
